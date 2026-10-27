@@ -5,14 +5,12 @@ import { logger } from './config/logger.js';
 
 async function bootstrap() {
   try {
-    logger.info('Starting SlotFlow Server (JavaScript ESM)...');
     await connectDB(env.MONGODB_URI);
 
     const app = createApp(env.MONGODB_URI);
 
     const server = app.listen(env.PORT, () => {
-      logger.info(`SlotFlow Server running on port ${env.PORT} [${env.NODE_ENV}]`);
-      logger.info(`Health check available at http://localhost:${env.PORT}/api/v1/health`);
+      console.log(`Server is running on port ${env.PORT}`);
     });
 
     const shutdown = async (signal) => {

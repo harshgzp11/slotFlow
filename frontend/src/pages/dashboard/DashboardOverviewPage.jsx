@@ -18,16 +18,16 @@ export function DashboardOverviewPage() {
   return (
     <div className="space-y-6">
       {/* Top Banner */}
-      <div className="bg-gradient-to-r from-indigo-900 via-indigo-800 to-slate-900 rounded-2xl p-6 text-white shadow-sm flex flex-col md:flex-row md:items-center md:justify-between">
+      <div className="bg-black rounded-2xl p-6 text-white shadow-sm flex flex-col md:flex-row md:items-center md:justify-between border border-gray-900">
         <div>
-          <div className="inline-flex items-center space-x-2 px-2.5 py-1 rounded-full bg-indigo-500/30 text-indigo-200 text-xs font-medium border border-indigo-400/30 mb-2">
+          <div className="inline-flex items-center space-x-2 px-2.5 py-1 rounded-full bg-white/10 text-gray-200 text-xs font-medium border border-white/15 mb-2.5">
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
             <span>Capacity Recovery Engine Active</span>
           </div>
           <h1 className="text-2xl font-bold tracking-tight">{activeBusiness?.name}</h1>
-          <p className="text-indigo-200 text-sm mt-1">
-            Timezone: <span className="font-semibold text-white">{activeBusiness?.timezone}</span> • Currency:{' '}
-            <span className="font-semibold text-white">{activeBusiness?.currency}</span>
+          <p className="text-gray-400 text-xs mt-1">
+            Timezone: <span className="font-medium text-white">{activeBusiness?.timezone}</span> • Currency:{' '}
+            <span className="font-medium text-white">{activeBusiness?.currency}</span>
           </p>
         </div>
 
@@ -36,10 +36,10 @@ export function DashboardOverviewPage() {
             href={`/book/${activeBusiness?.slug}`}
             target="_blank"
             rel="noreferrer"
-            className="inline-flex items-center space-x-2 px-4 py-2 bg-white text-slate-900 text-sm font-semibold rounded-lg hover:bg-slate-100 transition-colors shadow"
+            className="inline-flex items-center space-x-2 px-4 py-2 bg-white text-black text-xs font-semibold rounded-xl hover:bg-gray-100 transition-colors shadow-sm"
           >
             <span>Live Public Page</span>
-            <ExternalLink className="w-4 h-4" />
+            <ExternalLink className="w-3.5 h-3.5" />
           </a>
         </div>
       </div>

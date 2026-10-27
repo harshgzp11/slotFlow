@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext.jsx';
-import { AlertCircle, Loader2, ArrowRight } from 'lucide-react';
+import { AlertCircle, Loader2, User, Mail, Lock, Phone, Eye, EyeOff } from 'lucide-react';
 
 export const RegisterPage = () => {
   const { register } = useAuth();
@@ -10,6 +10,8 @@ export const RegisterPage = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [phone, setPhone] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -24,103 +26,112 @@ export const RegisterPage = () => {
 
     setIsSubmitting(true);
     try {
-      await register({ name, email, password });
+      await register({ name, email, password, phone: phone || undefined });
       navigate('/onboarding');
     } catch (err) {
-      setError(err.message || 'Registration failed.');
+      setError(err.message || 'Registration failed. Please check your information.');
     } finally {
       setIsSubmitting(false);
     }
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
-      <div className="sm:mx-auto sm:w-full sm:max-w-md text-center">
-        <div className="w-12 h-12 rounded-xl bg-indigo-600 flex items-center justify-center text-white font-bold text-2xl mx-auto shadow-md">
-          S
+    <div className="min-h-screen bg-[#f3f4f6] flex items-center justify-center p-4">
+      <div className="bg-white rounded-2xl shadow-[0_4px_25px_rgba(0,0,0,0.05)] border border-gray-100 p-8 sm:p-10 w-full max-w-[420px]">
+        <div className="text-center mb-8">
+          <h1 className="text-2xl font-light text-gray-800 tracking-tight">
+            Create an account
+          </h1>
+          <p className="text-sm text-gray-500 mt-1">
+            Join SlotFlow today.
+          </p>
         </div>
-        <h2 className="mt-4 text-2xl font-bold tracking-tight text-slate-900">
-          Create your SlotFlow account
-        </h2>
-        <p className="mt-1 text-sm text-slate-600">
-          Start recovering cancellations and streamlining bookings
-        </p>
-      </div>
 
-      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="bg-white py-8 px-6 shadow-sm border border-slate-200 rounded-xl sm:px-10">
-          {error && (
-            <div className="mb-4 p-3 rounded-lg bg-rose-50 border border-rose-200 flex items-center space-x-2 text-sm text-rose-700">
-              <AlertCircle className="w-4 h-4 flex-shrink-0" />
-              <span>{error}</span>
-            </div>
-          )}
+        {error && (
+          <div className="mb-5 p-3 rounded-xl bg-rose-50 border border-rose-200 flex items-center space-x-2 text-sm text-rose-700">
+            <AlertCircle className="w-4 h-4 flex-shrink-0" />
+            <span>{error}</span>
+          </div>
+        )}
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">
-                Full Name
-              </label>
-              <input
-                type="text"
-                required
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="Sarah Miller"
-                className="w-full px-3.5 py-2 border border-slate-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm"
-              />
-            </div>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="relative">
+            <User className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <input
+              type="text"
+              required
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Full Name"
+              className="w-full bg-[#f9fafb] border border-gray-200 rounded-lg py-3 pl-11 pr-4 text-sm text-gray-900 placeholder-gray-400 focus:bg-white focus:border-gray-900 focus:ring-1 focus:ring-gray-900 focus:outline-none transition-all"
+            />
+          </div>
 
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">
-                Email address
-              </label>
-              <input
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="sarah@luxestudio.com"
-                className="w-full px-3.5 py-2 border border-slate-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm"
-              />
-            </div>
+          <div className="relative">
+            <Mail className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <input
+              type="email"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Email Address"
+              className="w-full bg-[#f9fafb] border border-gray-200 rounded-lg py-3 pl-11 pr-4 text-sm text-gray-900 placeholder-gray-400 focus:bg-white focus:border-gray-900 focus:ring-1 focus:ring-gray-900 focus:outline-none transition-all"
+            />
+          </div>
 
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">
-                Password (min 8 characters)
-              </label>
-              <input
-                type="password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
-                className="w-full px-3.5 py-2 border border-slate-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-sm"
-              />
-            </div>
-
+          <div className="relative">
+            <Lock className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <input
+              type={showPassword ? 'text' : 'password'}
+              required
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Password"
+              className="w-full bg-[#f9fafb] border border-gray-200 rounded-lg py-3 pl-11 pr-11 text-sm text-gray-900 placeholder-gray-400 focus:bg-white focus:border-gray-900 focus:ring-1 focus:ring-gray-900 focus:outline-none transition-all"
+            />
             <button
-              type="submit"
-              disabled={isSubmitting}
-              className="w-full flex items-center justify-center py-2.5 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors disabled:opacity-50"
+              type="button"
+              onClick={() => setShowPassword((prev) => !prev)}
+              className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 focus:outline-none transition-colors"
+              aria-label={showPassword ? 'Hide password' : 'Show password'}
             >
-              {isSubmitting ? (
-                <Loader2 className="w-4 h-4 animate-spin" />
+              {showPassword ? (
+                <EyeOff className="w-4 h-4" />
               ) : (
-                <>
-                  <span>Create Account</span>
-                  <ArrowRight className="w-4 h-4 ml-1.5" />
-                </>
+                <Eye className="w-4 h-4" />
               )}
             </button>
-          </form>
-
-          <div className="mt-6 text-center text-sm">
-            <span className="text-slate-600">Already have an account? </span>
-            <Link to="/login" className="font-medium text-indigo-600 hover:text-indigo-500">
-              Sign in
-            </Link>
           </div>
+
+          <div className="relative">
+            <Phone className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <input
+              type="tel"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              placeholder="Phone Number"
+              className="w-full bg-[#f9fafb] border border-gray-200 rounded-lg py-3 pl-11 pr-4 text-sm text-gray-900 placeholder-gray-400 focus:bg-white focus:border-gray-900 focus:ring-1 focus:ring-gray-900 focus:outline-none transition-all"
+            />
+          </div>
+
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className="w-full py-3 px-4 bg-black hover:bg-neutral-800 text-white font-medium rounded-lg text-sm transition-colors shadow-sm flex items-center justify-center gap-2 disabled:opacity-50 mt-6"
+          >
+            {isSubmitting ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              <span>Create Account</span>
+            )}
+          </button>
+        </form>
+
+        <div className="mt-6 text-center text-sm text-gray-500">
+          Already have an account?{' '}
+          <Link to="/login" className="font-semibold text-black hover:underline">
+            Log in here
+          </Link>
         </div>
       </div>
     </div>
