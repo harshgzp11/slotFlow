@@ -66,14 +66,20 @@ export async function getAvailableSlots(params) {
   const bizCloseMinutes = parseTimeToMinutes(businessDay.closeTime);
 
   // 4. Resolve Eligible Staff
+  if (staffId) {
+    const isQualified = service.qualifiedStaffIds.some(
+      (id) => id.toString() === staffId.toString()
+    );
+    if (!isQualified) {
+      return [];
+    }
+  }
+
   let staffQuery = {
     businessId,
     isActive: true,
-    _id: { $in: service.qualifiedStaffIds }
+    _id: staffId ? staffId : { $in: service.qualifiedStaffIds }
   };
-  if (staffId) {
-    staffQuery._id = staffId;
-  }
 
   const eligibleStaff = await Staff.find(staffQuery);
   if (eligibleStaff.length === 0) {

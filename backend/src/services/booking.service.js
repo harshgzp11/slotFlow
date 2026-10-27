@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 import crypto from 'crypto';
-import { addMinutes } from 'date-fns';
+import { addMinutes, isBefore, isAfter, addDays } from 'date-fns';
+import { formatInTimeZone } from 'date-fns-tz';
 import { Business } from '../models/Business.js';
 import { Service } from '../models/Service.js';
 import { Staff } from '../models/Staff.js';
@@ -8,6 +9,8 @@ import { Booking } from '../models/Booking.js';
 import { SlotReservation } from '../models/SlotReservation.js';
 import { RecoveryJob } from '../models/RecoveryJob.js';
 import { ConflictError, NotFoundError, UnauthorizedError, ValidationError } from '../middleware/errorHandler.js';
+import { parseTimeToMinutes } from './availability.service.js';
+
 
 /**
  * Generates an array of discrete 15-minute start timestamps for the full booking block
@@ -53,6 +56,112 @@ export function verifyActionToken(storedHash, incomingToken) {
 }
 
 /**
+ * Server-side schedule validator for business hours, staff shifts, breaks, notice, horizon, qualification, and grid
+ * @param {Object} params
+ * @param {Object} params.business
+ * @param {Object} params.service
+ * @param {Object} params.staff
+ * @param {Date} params.startTimeUtc
+ */
+export function validateBookingSchedule(params) {
+  const { business, service, staff, startTimeUtc } = params;
+
+  // 1. Validate 15-minute slot boundary alignment
+  const minutes = startTimeUtc.getUTCMinutes();
+  const seconds = startTimeUtc.getUTCSeconds();
+  const ms = startTimeUtc.getUTCMilliseconds();
+  if (minutes % 15 !== 0 || seconds !== 0 || ms !== 0) {
+    throw new ValidationError(
+      'Appointments must start on a 15-minute slot boundary (e.g., :00, :15, :30, :45).'
+    );
+  }
+
+  // 2. Minimum advance notice enforcement
+  const now = new Date();
+  const minNoticeHours = business.bookingPolicies?.minNoticeHours ?? 0;
+  if (minNoticeHours > 0) {
+    const earliestAllowedUtc = addMinutes(now, minNoticeHours * 60);
+    if (isBefore(startTimeUtc, earliestAllowedUtc)) {
+      throw new ValidationError(
+        `Appointment violates the minimum advance notice policy (${minNoticeHours} hours).`
+      );
+    }
+  }
+
+  // 3. Maximum booking horizon enforcement
+  const maxHorizonDays = business.bookingPolicies?.maxHorizonDays;
+  if (maxHorizonDays && maxHorizonDays > 0) {
+    const latestAllowedUtc = addDays(now, maxHorizonDays);
+    if (isAfter(startTimeUtc, latestAllowedUtc)) {
+      throw new ValidationError(
+        `Appointment exceeds the maximum booking horizon (${maxHorizonDays} days in advance).`
+      );
+    }
+  }
+
+  // 4. Staff qualification enforcement
+  if (!service.qualifiedStaffIds.some((id) => id.toString() === staff._id.toString())) {
+    throw new ValidationError('Selected staff member is not qualified for this service.');
+  }
+
+  // 5. Business hours enforcement in business timezone
+  const tz = business.timezone || 'UTC';
+  const dayOfWeek = parseInt(formatInTimeZone(startTimeUtc, tz, 'i'), 10) % 7; // 0 = Sun
+  const businessDay = business.workingHours.find((h) => h.dayOfWeek === dayOfWeek);
+  if (!businessDay || !businessDay.isOpen) {
+    throw new ValidationError('The business is closed on the selected day.');
+  }
+
+  const localTimeStr = formatInTimeZone(startTimeUtc, tz, 'HH:mm');
+  const startMinutes = parseTimeToMinutes(localTimeStr);
+  const bufferBefore = service.bufferBefore || 0;
+  const bufferAfter = service.bufferAfter || 0;
+  const durationMinutes = service.durationMinutes;
+
+  const blockStartMinutes = startMinutes - bufferBefore;
+  const blockEndMinutes = startMinutes + durationMinutes + bufferAfter;
+
+  const bizOpenMinutes = parseTimeToMinutes(businessDay.openTime);
+  const bizCloseMinutes = parseTimeToMinutes(businessDay.closeTime);
+
+  if (blockStartMinutes < bizOpenMinutes || blockEndMinutes > bizCloseMinutes) {
+    throw new ValidationError(
+      'Appointment and its buffers must fall entirely within business operating hours.'
+    );
+  }
+
+  // 6. Staff shift schedule enforcement
+  const staffDay = staff.weeklySchedule.find((s) => s.dayOfWeek === dayOfWeek);
+  if (!staffDay || !staffDay.isWorking) {
+    throw new ValidationError('Selected staff member is not scheduled to work on this day.');
+  }
+
+  const staffShiftStartMinutes = parseTimeToMinutes(staffDay.shiftStart);
+  const staffShiftEndMinutes = parseTimeToMinutes(staffDay.shiftEnd);
+
+  if (blockStartMinutes < staffShiftStartMinutes || blockEndMinutes > staffShiftEndMinutes) {
+    throw new ValidationError(
+      "Appointment and its buffers must fall entirely within the staff member's scheduled shift."
+    );
+  }
+
+  // 7. Staff break collision enforcement
+  const staffBreaks = (staffDay.breaks || []).map((b) => ({
+    start: parseTimeToMinutes(b.start),
+    end: parseTimeToMinutes(b.end)
+  }));
+
+  const collidesWithBreak = staffBreaks.some(
+    (b) => Math.max(blockStartMinutes, b.start) < Math.min(blockEndMinutes, b.end)
+  );
+  if (collidesWithBreak) {
+    throw new ValidationError(
+      'Appointment or its buffers conflict with a scheduled staff break.'
+    );
+  }
+}
+
+/**
  * Creates a confirmed booking and reserves 15-minute cells atomically under transaction
  * @param {Object} params
  */
@@ -70,10 +179,14 @@ export async function createBooking(params) {
   if (!service) throw new NotFoundError('Service not found or inactive.');
   if (!staff) throw new NotFoundError('Staff member not found or inactive.');
 
-  // Validate staff qualification
-  if (!service.qualifiedStaffIds.some((id) => id.equals(staff._id))) {
-    throw new ValidationError('Selected staff member is not qualified for this service.');
-  }
+  // Validate appointment schedule strictly on server
+  validateBookingSchedule({
+    business,
+    service,
+    staff,
+    startTimeUtc
+  });
+
 
   const { durationMinutes, bufferBefore, bufferAfter, price } = service;
   const endTimeUtc = addMinutes(startTimeUtc, durationMinutes);
@@ -263,6 +376,23 @@ export async function rescheduleBooking(params) {
       if (rawToken && !verifyActionToken(booking.manageTokenHash, rawToken)) {
         throw new UnauthorizedError('Invalid management token.');
       }
+
+      const [business, service, staff] = await Promise.all([
+        Business.findOne({ _id: businessId, isActive: true }).session(session),
+        Service.findOne({ _id: booking.serviceId, businessId, isActive: true }).session(session),
+        Staff.findOne({ _id: booking.staffId, businessId, isActive: true }).session(session)
+      ]);
+
+      if (!business) throw new NotFoundError('Business not found or inactive.');
+      if (!service) throw new NotFoundError('Service not found or inactive.');
+      if (!staff) throw new NotFoundError('Staff member not found or inactive.');
+
+      validateBookingSchedule({
+        business,
+        service,
+        staff,
+        startTimeUtc: newStartTimeUtc
+      });
 
       const newEndTimeUtc = addMinutes(newStartTimeUtc, booking.durationMinutesSnapshot);
 

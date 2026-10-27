@@ -9,7 +9,8 @@ import {
   processClaimedRecoveryJob,
   acceptWaitlistOffer,
   declineWaitlistOffer,
-  hashClaimToken
+  hashClaimToken,
+  verifyClaimToken
 } from '../services/recovery.service.js';
 import { NotFoundError, UnauthorizedError, ValidationError, ConflictError } from '../middleware/errorHandler.js';
 
@@ -95,7 +96,7 @@ export async function getPublicOffer(req, res, next) {
       throw new NotFoundError('Waitlist offer not found.');
     }
 
-    if (offer.claimTokenHash !== hashClaimToken(String(token))) {
+    if (!verifyClaimToken(offer.claimTokenHash, String(token))) {
       throw new UnauthorizedError('Invalid claim token.');
     }
 

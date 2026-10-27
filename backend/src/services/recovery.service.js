@@ -7,11 +7,34 @@ import { SlotReservation } from '../models/SlotReservation.js';
 import { Booking } from '../models/Booking.js';
 import { Service } from '../models/Service.js';
 import { Business } from '../models/Business.js';
+import { fromZonedTime, formatInTimeZone } from 'date-fns-tz';
 import { ConflictError, NotFoundError, UnauthorizedError, ValidationError } from '../middleware/errorHandler.js';
+
+
 
 export function hashClaimToken(rawToken) {
   return crypto.createHash('sha256').update(rawToken).digest('hex');
 }
+
+/**
+ * Constant-time comparison between stored SHA-256 hash and incoming raw claim token
+ * @param {string} storedHash
+ * @param {string} incomingToken
+ * @returns {boolean}
+ */
+export function verifyClaimToken(storedHash, incomingToken) {
+  if (!storedHash || !incomingToken) return false;
+  const incomingHash = hashClaimToken(incomingToken);
+  const storedBuf = Buffer.from(storedHash, 'hex');
+  const incomingBuf = Buffer.from(incomingHash, 'hex');
+
+  if (storedBuf.length !== 32 || incomingBuf.length !== 32) {
+    return false;
+  }
+
+  return crypto.timingSafeEqual(storedBuf, incomingBuf);
+}
+
 
 /**
  * Claims a pending or expired-lease RecoveryJob using atomic lease fencing
@@ -54,12 +77,8 @@ export async function findNextEligibleCandidate(params) {
   const business = await Business.findById(businessId).session(session || null);
   const tz = business?.timezone || 'UTC';
 
-  // Calculate local hour of vacated start time
-  const localDateStr = startTimeUtc.toLocaleDateString('en-US', { timeZone: tz });
-  const localHour = parseInt(
-    startTimeUtc.toLocaleTimeString('en-US', { timeZone: tz, hour: 'numeric', hour12: false }),
-    10
-  );
+  // Calculate local hour of vacated start time deterministically in business timezone
+  const localHour = parseInt(formatInTimeZone(startTimeUtc, tz, 'H'), 10);
 
   let targetTimeOfDay = 'ANY';
   if (localHour < 12) {
@@ -89,17 +108,22 @@ export async function findNextEligibleCandidate(params) {
   }
   const candidates = await query;
 
-  // 3. Filter candidates by date window (with flexibleDays expansion) and time of day
+  // 3. Filter candidates by date window (with flexibleDays expansion) and time of day in business timezone
   for (const candidate of candidates) {
-    // Calculate date window with flexibility
-    const flexMs = (candidate.flexibleDays || 0) * 24 * 60 * 60 * 1000;
-    const windowStart = new Date(candidate.preferredDateRange.startDate.getTime() - flexMs);
-    const windowEnd = new Date(candidate.preferredDateRange.endDate.getTime() + flexMs);
+    const flexDays = candidate.flexibleDays || 0;
+    const flexMs = flexDays * 24 * 60 * 60 * 1000;
 
-    // End of window day at 23:59:59.999
-    windowEnd.setHours(23, 59, 59, 999);
+    const startDateStr = candidate.preferredDateRange.startDate.toISOString().slice(0, 10);
+    const endDateStr = candidate.preferredDateRange.endDate.toISOString().slice(0, 10);
 
-    if (startTimeUtc < windowStart || startTimeUtc > windowEnd) {
+    const windowStartUtc = new Date(
+      fromZonedTime(`${startDateStr}T00:00:00`, tz).getTime() - flexMs
+    );
+    const windowEndUtc = new Date(
+      fromZonedTime(`${endDateStr}T23:59:59.999`, tz).getTime() + flexMs
+    );
+
+    if (startTimeUtc < windowStartUtc || startTimeUtc > windowEndUtc) {
       continue;
     }
 
@@ -267,7 +291,7 @@ export async function acceptWaitlistOffer(params) {
     throw new NotFoundError('Waitlist offer not found.');
   }
 
-  if (initialOffer.claimTokenHash !== claimTokenHash) {
+  if (!verifyClaimToken(initialOffer.claimTokenHash, rawClaimToken)) {
     throw new UnauthorizedError('Invalid claim token for this offer.');
   }
 
@@ -292,6 +316,47 @@ export async function acceptWaitlistOffer(params) {
 
       if (!offer) {
         throw new ConflictError('Offer is no longer available.');
+      }
+
+      // Re-verify token inside transaction
+      if (!verifyClaimToken(offer.claimTokenHash, rawClaimToken)) {
+        throw new UnauthorizedError('Invalid claim token for this offer.');
+      }
+
+      // Recheck status and expiresAt inside the transaction to eliminate race conditions
+      if (offer.expiresAt < new Date()) {
+        offer.status = 'EXPIRED';
+        offer.responseReceivedAt = new Date();
+        await offer.save({ session });
+
+        await WaitlistEntry.updateOne(
+          { _id: offer.waitlistEntryId, status: 'OFFERED' },
+          { $set: { status: 'EXPIRED' } },
+          { session }
+        );
+
+        await SlotReservation.updateMany(
+          { _id: { $in: offer.holdSlotReservationIds } },
+          {
+            $set: {
+              holdType: 'RECOVERY_PENDING',
+              recoveryJobId: offer.recoveryJobId
+            },
+            $unset: {
+              holdOfferId: 1,
+              holdExpiresAtUtc: 1
+            }
+          },
+          { session }
+        );
+
+        await RecoveryJob.updateOne(
+          { _id: offer.recoveryJobId },
+          { $set: { status: 'PENDING', lockedUntil: null, leaseToken: null } },
+          { session }
+        );
+
+        throw new ConflictError('This recovery offer has expired and the slot was released for reassignment.');
       }
 
       const waitlistEntry = await WaitlistEntry.findById(offer.waitlistEntryId).session(session);
@@ -449,18 +514,19 @@ export async function handleOfferExpired(offerId) {
  * @param {string} rawClaimToken
  */
 export async function declineWaitlistOffer(offerId, rawClaimToken) {
-  const claimTokenHash = hashClaimToken(rawClaimToken);
+  if (!offerId || !rawClaimToken) {
+    throw new ValidationError('offerId and claimToken are required.');
+  }
 
   const session = await mongoose.startSession();
   try {
     return await session.withTransaction(async () => {
       const offer = await WaitlistOffer.findOne({
         _id: offerId,
-        status: 'PENDING',
-        claimTokenHash
+        status: 'PENDING'
       }).session(session);
 
-      if (!offer) {
+      if (!offer || !verifyClaimToken(offer.claimTokenHash, rawClaimToken)) {
         throw new NotFoundError('Active offer not found or token invalid.');
       }
 
