@@ -11,6 +11,7 @@ import queueRoutes from './queue.routes.js';
 
 import mongoose from 'mongoose';
 import { env } from '../config/env.js';
+import { getRecoveryWorkerStatus } from '../workers/recovery.worker.js';
 
 const router = Router();
 
@@ -18,6 +19,10 @@ const router = Router();
 router.get('/health', (_req, res) => {
   const dbState = mongoose.connection.readyState;
   const isDbConnected = dbState === 1;
+  const workerStatus = getRecoveryWorkerStatus();
+
+  // env.ENABLE_BACKGROUND_WORKER is parsed as boolean by zod (handles boolean or 'true' string safely)
+  const isWorkerConfigured = env.ENABLE_BACKGROUND_WORKER === true || env.ENABLE_BACKGROUND_WORKER === 'true';
 
   const healthData = {
     status: isDbConnected ? 'ok' : 'degraded',
@@ -29,7 +34,12 @@ router.get('/health', (_req, res) => {
       readyState: dbState
     },
     worker: {
-      enabled: env.ENABLE_BACKGROUND_WORKER === 'true'
+      configured: isWorkerConfigured,
+      enabled: isWorkerConfigured,
+      running: workerStatus.running,
+      workerId: workerStatus.workerId,
+      intervalMs: workerStatus.intervalMs || env.WORKER_INTERVAL_MS,
+      lastIterationAt: workerStatus.lastIterationAt
     }
   };
 

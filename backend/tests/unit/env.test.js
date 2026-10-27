@@ -79,3 +79,39 @@ describe('Production Session Security (Finding 1)', () => {
     expect(parsed.NODE_ENV).toBe('test');
   });
 });
+
+describe('ENABLE_BACKGROUND_WORKER Configuration Parsing', () => {
+  const baseValidEnv = {
+    PORT: '5000',
+    CLIENT_ORIGIN: 'http://localhost:5173',
+    MONGODB_URI: 'mongodb://localhost:27017/slotflow_test',
+    NODE_ENV: 'test'
+  };
+
+  it('defaults to true when ENABLE_BACKGROUND_WORKER is omitted', () => {
+    const parsed = validateEnv({ ...baseValidEnv });
+    expect(parsed.ENABLE_BACKGROUND_WORKER).toBe(true);
+  });
+
+  it('parses string "true" into boolean true', () => {
+    const parsed = validateEnv({ ...baseValidEnv, ENABLE_BACKGROUND_WORKER: 'true' });
+    expect(parsed.ENABLE_BACKGROUND_WORKER).toBe(true);
+    expect(typeof parsed.ENABLE_BACKGROUND_WORKER).toBe('boolean');
+  });
+
+  it('parses string "false" into boolean false', () => {
+    const parsed = validateEnv({ ...baseValidEnv, ENABLE_BACKGROUND_WORKER: 'false' });
+    expect(parsed.ENABLE_BACKGROUND_WORKER).toBe(false);
+    expect(typeof parsed.ENABLE_BACKGROUND_WORKER).toBe('boolean');
+  });
+
+  it('preserves native boolean true and false', () => {
+    expect(validateEnv({ ...baseValidEnv, ENABLE_BACKGROUND_WORKER: true }).ENABLE_BACKGROUND_WORKER).toBe(true);
+    expect(validateEnv({ ...baseValidEnv, ENABLE_BACKGROUND_WORKER: false }).ENABLE_BACKGROUND_WORKER).toBe(false);
+  });
+
+  it('parses string "1" and "0" correctly', () => {
+    expect(validateEnv({ ...baseValidEnv, ENABLE_BACKGROUND_WORKER: '1' }).ENABLE_BACKGROUND_WORKER).toBe(true);
+    expect(validateEnv({ ...baseValidEnv, ENABLE_BACKGROUND_WORKER: '0' }).ENABLE_BACKGROUND_WORKER).toBe(false);
+  });
+});

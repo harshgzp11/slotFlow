@@ -145,12 +145,37 @@ describe('Recovery Worker Unit Tests', () => {
     expect(remainingCell).toBeNull();
   });
 
-  it('starts and stops continuous worker loop cleanly', async () => {
+  it('starts and stops continuous worker loop cleanly and reports status', async () => {
+    const { getRecoveryWorkerStatus } = await import('../../src/workers/recovery.worker.js');
+
+    expect(getRecoveryWorkerStatus().running).toBe(false);
+
     const worker = startRecoveryWorker({ intervalMs: 500, workerId: 'test-timer-worker' });
     expect(worker.isRunning()).toBe(true);
     expect(worker.workerId).toBe('test-timer-worker');
 
+    const statusRunning = getRecoveryWorkerStatus();
+    expect(statusRunning.running).toBe(true);
+    expect(statusRunning.workerId).toBe('test-timer-worker');
+    expect(statusRunning.intervalMs).toBe(500);
+
     worker.stop();
     expect(worker.isRunning()).toBe(false);
+    expect(getRecoveryWorkerStatus().running).toBe(false);
+  });
+
+  it('prevents accidental duplicate worker startup when already running', async () => {
+    const worker1 = startRecoveryWorker({ intervalMs: 1000, workerId: 'primary-worker' });
+    expect(worker1.isRunning()).toBe(true);
+
+    // Attempt starting a second worker
+    const worker2 = startRecoveryWorker({ intervalMs: 2000, workerId: 'duplicate-worker' });
+
+    // Should return the active worker1 instance and not create a second loop
+    expect(worker2).toBe(worker1);
+    expect(worker2.workerId).toBe('primary-worker');
+
+    worker1.stop();
+    expect(worker1.isRunning()).toBe(false);
   });
 });

@@ -35,7 +35,7 @@ export const envSchema = z
     ENABLE_BACKGROUND_WORKER: z
       .union([z.string(), z.boolean()])
       .default(true)
-      .transform((val) => val === true || val === 'true'),
+      .transform((val) => val === true || val === 'true' || val === '1' || val === 'yes'),
     WORKER_INTERVAL_MS: z
       .union([z.string(), z.number()])
       .default(15000)

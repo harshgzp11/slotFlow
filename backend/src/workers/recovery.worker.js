@@ -98,17 +98,51 @@ export async function runWorkerIteration(workerId, options = {}) {
   }
 }
 
+let activeWorker = null;
+let lastRecordedIterationAt = null;
+
+/**
+ * Returns current status of in-process recovery worker
+ * @returns {{ running: boolean, workerId: string|null, intervalMs: number|null, lastIterationAt: string|null }}
+ */
+export function getRecoveryWorkerStatus() {
+  const isRunning = Boolean(activeWorker && activeWorker.isRunning());
+  return {
+    running: isRunning,
+    workerId: isRunning ? activeWorker.workerId : null,
+    intervalMs: isRunning ? activeWorker.intervalMs : null,
+    lastIterationAt: isRunning ? activeWorker.lastIterationAt : lastRecordedIterationAt
+  };
+}
+
+/**
+ * Stops any active in-process recovery worker singleton
+ */
+export function stopRecoveryWorker() {
+  if (activeWorker) {
+    activeWorker.stop();
+    activeWorker = null;
+  }
+}
+
 /**
  * Starts continuous background recovery worker loop
  * @param {Object} [options]
- * @returns {{ workerId: string, isRunning: () => boolean, stop: () => void }}
+ * @returns {{ workerId: string, intervalMs: number, lastIterationAt: string|null, isRunning: () => boolean, stop: () => void }}
  */
 export function startRecoveryWorker(options = {}) {
+  // Prevent duplicate workers from running concurrently in the same process
+  if (activeWorker && activeWorker.isRunning()) {
+    logger.warn(`[RecoveryWorker] Worker ${activeWorker.workerId} is already running. Skipping duplicate startup.`);
+    return activeWorker;
+  }
+
   const intervalMs = options.intervalMs || env.WORKER_INTERVAL_MS || 15000;
   const workerId = options.workerId || `worker-${process.pid}-${crypto.randomBytes(3).toString('hex')}`;
 
   let isRunning = true;
   let isExecuting = false;
+  let lastIterationAt = null;
 
   logger.info(`[RecoveryWorker] Initialized worker ${workerId} with interval ${intervalMs}ms.`);
 
@@ -116,6 +150,11 @@ export function startRecoveryWorker(options = {}) {
     if (!isRunning || isExecuting) return;
     isExecuting = true;
     try {
+      lastIterationAt = new Date().toISOString();
+      lastRecordedIterationAt = lastIterationAt;
+      if (activeWorkerInstance) {
+        activeWorkerInstance.lastIterationAt = lastIterationAt;
+      }
       await runWorkerIteration(workerId, options);
     } catch (err) {
       logger.error(`[RecoveryWorker] Error in iteration cycle:`, err);
@@ -124,15 +163,28 @@ export function startRecoveryWorker(options = {}) {
     }
   }, intervalMs);
 
-  return {
+  const activeWorkerInstance = {
     workerId,
+    intervalMs,
+    get lastIterationAt() {
+      return lastIterationAt;
+    },
+    set lastIterationAt(val) {
+      lastIterationAt = val;
+    },
     isRunning: () => isRunning,
     stop: () => {
       isRunning = false;
       clearInterval(intervalTimer);
       logger.info(`[RecoveryWorker] Stopped worker ${workerId}.`);
+      if (activeWorker && activeWorker.workerId === workerId) {
+        activeWorker = null;
+      }
     }
   };
+
+  activeWorker = activeWorkerInstance;
+  return activeWorkerInstance;
 }
 
 // Standalone CLI execution
