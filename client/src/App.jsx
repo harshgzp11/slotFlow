@@ -9,13 +9,21 @@ import { DashboardOverviewPage } from './pages/dashboard/DashboardOverviewPage.j
 import { ServicesPage } from './pages/dashboard/ServicesPage.jsx';
 import { StaffPage } from './pages/dashboard/StaffPage.jsx';
 import { SettingsPage } from './pages/dashboard/SettingsPage.jsx';
+import { BookingsPage } from './pages/dashboard/BookingsPage.jsx';
 import { PlaceholderPage } from './pages/dashboard/PlaceholderPage.jsx';
+import { PublicBookingPage } from './pages/public/PublicBookingPage.jsx';
+import { ManageBookingPage } from './pages/public/ManageBookingPage.jsx';
 
 export function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
         <Routes>
+          {/* Public Booking & Guest Management Pages */}
+          <Route path="/book/:slug" element={<PublicBookingPage />} />
+          <Route path="/appointments/:id/manage" element={<ManageBookingPage />} />
+          <Route path="/guest/bookings/:id" element={<ManageBookingPage />} />
+
           {/* Public Auth Routes */}
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
@@ -27,16 +35,7 @@ export function App() {
             <Route path="services" element={<ServicesPage />} />
             <Route path="staff" element={<StaffPage />} />
             <Route path="settings" element={<SettingsPage />} />
-            <Route
-              path="bookings"
-              element={
-                <PlaceholderPage
-                  title="Appointment Bookings"
-                  subtitle="Atomic 15-minute slot reservations, conflict prevention, and calendar view"
-                  milestone="Milestone 2"
-                />
-              }
-            />
+            <Route path="bookings" element={<BookingsPage />} />
             <Route
               path="waitlist"
               element={
