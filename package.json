@@ -1,0 +1,29 @@
+{
+  "name": "slotflow-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "SlotFlow — Smart scheduling and business operations SaaS with automated cancellation recovery",
+  "workspaces": [
+    "server",
+    "client"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspace=server",
+    "dev:server": "npm run dev --workspace=server",
+    "dev:client": "npm run dev --workspace=client",
+    "build": "npm run build --workspaces",
+    "build:server": "npm run build --workspace=server",
+    "build:client": "npm run build --workspace=client",
+    "test": "npm run test --workspace=server",
+    "seed": "npm run seed --workspace=server"
+  },
+  "keywords": [
+    "saas",
+    "scheduling",
+    "cancellation-recovery",
+    "mern",
+    "typescript"
+  ],
+  "author": "Harsh Srivastava",
+  "license": "ISC"
+}
