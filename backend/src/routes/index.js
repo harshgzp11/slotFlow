@@ -9,16 +9,32 @@ import waitlistRoutes from './waitlist.routes.js';
 import analyticsRoutes from './analytics.routes.js';
 import queueRoutes from './queue.routes.js';
 
+import mongoose from 'mongoose';
+import { env } from '../config/env.js';
+
 const router = Router();
 
-// Health check endpoint
+// Health check endpoint with database connectivity check
 router.get('/health', (_req, res) => {
-  res.status(200).json({
-    status: 'ok',
+  const dbState = mongoose.connection.readyState;
+  const isDbConnected = dbState === 1;
+
+  const healthData = {
+    status: isDbConnected ? 'ok' : 'degraded',
     timestamp: new Date().toISOString(),
     service: 'slotflow-api',
-    uptime: process.uptime()
-  });
+    uptime: Math.floor(process.uptime()),
+    database: {
+      status: isDbConnected ? 'connected' : 'disconnected',
+      readyState: dbState
+    },
+    worker: {
+      enabled: env.ENABLE_BACKGROUND_WORKER === 'true'
+    }
+  };
+
+  const statusCode = isDbConnected ? 200 : 503;
+  res.status(statusCode).json(healthData);
 });
 
 router.use('/public', publicRoutes);

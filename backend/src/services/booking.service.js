@@ -44,6 +44,9 @@ export function generateReservationCells(params) {
  * @returns {boolean}
  */
 export function verifyActionToken(storedHash, incomingToken) {
+  if (!storedHash || !incomingToken) {
+    return false;
+  }
   const incomingHash = crypto.createHash('sha256').update(incomingToken).digest('hex');
   const storedBuf = Buffer.from(storedHash, 'hex');
   const incomingBuf = Buffer.from(incomingHash, 'hex');
@@ -286,10 +289,13 @@ export async function cancelBookingWithZeroGap(params) {
         throw new ConflictError(`Cannot cancel booking with current status: ${booking.status}`);
       }
 
-      // If token provided (guest cancellation), verify it
+      // If token provided (guest cancellation), verify it and check expiration
       if (rawToken) {
         if (!verifyActionToken(booking.manageTokenHash, rawToken)) {
           throw new UnauthorizedError('Invalid management token.');
+        }
+        if (booking.manageTokenExpiresAt && booking.manageTokenExpiresAt < new Date()) {
+          throw new UnauthorizedError('Management token has expired.');
         }
       }
 
@@ -373,8 +379,13 @@ export async function rescheduleBooking(params) {
         throw new ConflictError(`Cannot reschedule booking with status: ${booking.status}`);
       }
 
-      if (rawToken && !verifyActionToken(booking.manageTokenHash, rawToken)) {
-        throw new UnauthorizedError('Invalid management token.');
+      if (rawToken) {
+        if (!verifyActionToken(booking.manageTokenHash, rawToken)) {
+          throw new UnauthorizedError('Invalid management token.');
+        }
+        if (booking.manageTokenExpiresAt && booking.manageTokenExpiresAt < new Date()) {
+          throw new UnauthorizedError('Management token has expired.');
+        }
       }
 
       const [business, service, staff] = await Promise.all([

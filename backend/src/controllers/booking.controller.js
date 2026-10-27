@@ -127,6 +127,10 @@ export async function getManageBooking(req, res, next) {
       throw new UnauthorizedError('Invalid management token.');
     }
 
+    if (booking.manageTokenExpiresAt && booking.manageTokenExpiresAt < new Date()) {
+      throw new UnauthorizedError('Management token has expired.');
+    }
+
     res.status(200).json({
       success: true,
       data: { booking }

@@ -17,15 +17,22 @@ import {
   joinPublicQueue,
   getPublicTicketStatus
 } from '../controllers/queue.controller.js';
+import { createRateLimiter } from '../middleware/rateLimiter.js';
 
 const router = Router();
+
+const publicBookingLimiter = createRateLimiter({
+  windowMs: 15 * 60 * 1000,
+  max: 30,
+  message: 'Too many booking attempts from this IP. Please wait a few minutes before trying again.'
+});
 
 // Public Business Profile & Catalog
 router.get('/businesses/:slug', getPublicBusinessBySlug);
 
 // Public Availability & Booking
 router.get('/availability', getPublicAvailability);
-router.post('/bookings', createPublicBooking);
+router.post('/bookings', publicBookingLimiter, createPublicBooking);
 
 // Public Waitlist Intake
 router.post('/businesses/:slug/waitlist', joinPublicWaitlist);

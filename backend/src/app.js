@@ -34,16 +34,37 @@ export function createApp(mongoUrl) {
         // Allow requests with no origin (e.g. mobile apps, curl, server-to-server, supertest)
         if (!origin) return callback(null, true);
         const normalizedOrigin = origin.replace(/\/+$/, '');
-        if (allowedOrigins.includes(normalizedOrigin) || allowedOrigins.includes('*')) {
+        if (allowedOrigins.includes(normalizedOrigin)) {
           return callback(null, true);
         }
-        return callback(new Error(`CORS blocked for origin: ${origin}`));
+        // In non-production environments, allow localhost / 127.0.0.1 origins for development flexibility
+        if (
+          env.NODE_ENV !== 'production' &&
+          (/^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(normalizedOrigin) || allowedOrigins.includes('*'))
+        ) {
+          return callback(null, true);
+        }
+        return callback(null, false);
       },
       credentials: true,
       methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
       allowedHeaders: ['Content-Type', 'Authorization', 'x-business-id']
     })
   );
+
+  // Platform root & health probes (Render, Vercel, ALB)
+  app.get('/', (_req, res) => {
+    res.status(200).json({
+      name: 'SlotFlow API',
+      status: 'ok',
+      version: '1.0.0',
+      apiPrefix: '/api/v1'
+    });
+  });
+
+  app.get('/health', (_req, res) => {
+    res.redirect(307, '/api/v1/health');
+  });
 
   // Body Parsing
   app.use(express.json({ limit: '1mb' }));

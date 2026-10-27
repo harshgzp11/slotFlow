@@ -35,6 +35,15 @@ export async function register(req, res, next) {
       systemRole: 'USER'
     });
 
+    if (req.session?.regenerate) {
+      await new Promise((resolve, reject) => {
+        req.session.regenerate((err) => {
+          if (err) return reject(err);
+          resolve();
+        });
+      });
+    }
+
     req.session.userId = user._id.toString();
 
     res.status(201).json({
@@ -66,6 +75,16 @@ export async function login(req, res, next) {
     const isMatch = await bcrypt.compare(password, user.passwordHash);
     if (!isMatch) {
       throw new UnauthorizedError('Invalid email or password.');
+    }
+
+    // Regenerate session to eliminate session fixation vulnerabilities
+    if (req.session?.regenerate) {
+      await new Promise((resolve, reject) => {
+        req.session.regenerate((err) => {
+          if (err) return reject(err);
+          resolve();
+        });
+      });
     }
 
     req.session.userId = user._id.toString();
@@ -100,15 +119,26 @@ export async function login(req, res, next) {
 
 export async function logout(req, res, next) {
   try {
-    req.session.destroy((err) => {
-      if (err) {
-        return next(err);
-      }
-      res.clearCookie('connect.sid');
-      res.status(200).json({
-        success: true,
-        message: 'Logged out successfully.'
+    if (req.session) {
+      await new Promise((resolve, reject) => {
+        req.session.destroy((err) => {
+          if (err) return reject(err);
+          resolve();
+        });
       });
+    }
+
+    const isProd = process.env.NODE_ENV === 'production';
+    res.clearCookie('connect.sid', {
+      path: '/',
+      httpOnly: true,
+      secure: isProd,
+      sameSite: isProd ? 'none' : 'lax'
+    });
+
+    res.status(200).json({
+      success: true,
+      message: 'Logged out successfully.'
     });
   } catch (error) {
     next(error);

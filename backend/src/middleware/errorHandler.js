@@ -41,11 +41,39 @@ export class ValidationError extends AppError {
   }
 }
 
+export class TooManyRequestsError extends AppError {
+  constructor(message = 'Too many requests. Please try again later.', details = undefined) {
+    super(message, 429, details);
+  }
+}
+
 export function errorHandler(err, req, res, _next) {
   logger.error(`Error processing ${req.method} ${req.path}:`, {
     message: err.message,
     stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
   });
+
+  // Handle Body-Parser Malformed JSON Syntax Errors
+  if (err instanceof SyntaxError && err.status === 400 && 'body' in err) {
+    return res.status(400).json({
+      success: false,
+      error: {
+        code: 'MALFORMED_JSON',
+        message: 'Invalid JSON payload received in request body.'
+      }
+    });
+  }
+
+  // Handle Mongoose CastError (invalid ObjectId format)
+  if (err.name === 'CastError') {
+    return res.status(400).json({
+      success: false,
+      error: {
+        code: 'INVALID_ID_FORMAT',
+        message: `Invalid identifier format for field "${err.path}"`
+      }
+    });
+  }
 
   // Handle Zod Schema Validation Errors
   if (err instanceof ZodError) {
