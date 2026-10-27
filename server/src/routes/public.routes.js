@@ -13,6 +13,10 @@ import {
   acceptPublicOffer,
   declinePublicOffer
 } from '../controllers/waitlist.controller.js';
+import {
+  joinPublicQueue,
+  getPublicTicketStatus
+} from '../controllers/queue.controller.js';
 
 const router = Router();
 
@@ -25,6 +29,10 @@ router.post('/bookings', createPublicBooking);
 
 // Public Waitlist Intake
 router.post('/businesses/:slug/waitlist', joinPublicWaitlist);
+
+// Public Walk-In Queue Intake & Tracking
+router.post('/businesses/:slug/queue', joinPublicQueue);
+router.get('/queue/tickets/:id', getPublicTicketStatus);
 
 // Public Waitlist Recovery Offer Actions
 router.get('/offers/:id', getPublicOffer);

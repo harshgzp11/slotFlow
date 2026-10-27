@@ -12,7 +12,7 @@ import { SettingsPage } from './pages/dashboard/SettingsPage.jsx';
 import { BookingsPage } from './pages/dashboard/BookingsPage.jsx';
 import { WaitlistPage } from './pages/dashboard/WaitlistPage.jsx';
 import { AnalyticsPage } from './pages/dashboard/AnalyticsPage.jsx';
-import { PlaceholderPage } from './pages/dashboard/PlaceholderPage.jsx';
+import { QueuePage } from './pages/dashboard/QueuePage.jsx';
 import { PublicBookingPage } from './pages/public/PublicBookingPage.jsx';
 import { ManageBookingPage } from './pages/public/ManageBookingPage.jsx';
 import { ClaimOfferPage } from './pages/public/ClaimOfferPage.jsx';
@@ -42,16 +42,7 @@ export function App() {
             <Route path="bookings" element={<BookingsPage />} />
             <Route path="waitlist" element={<WaitlistPage />} />
             <Route path="analytics" element={<AnalyticsPage />} />
-            <Route
-              path="queue"
-              element={
-                <PlaceholderPage
-                  title="Walk-in Queue Management"
-                  subtitle="FIFO customer queue, status transitions, and dynamic wait-time estimation"
-                  milestone="Milestone 5"
-                />
-              }
-            />
+            <Route path="queue" element={<QueuePage />} />
           </Route>
 
           {/* Root redirect */}
