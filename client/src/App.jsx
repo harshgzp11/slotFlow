@@ -10,19 +10,22 @@ import { ServicesPage } from './pages/dashboard/ServicesPage.jsx';
 import { StaffPage } from './pages/dashboard/StaffPage.jsx';
 import { SettingsPage } from './pages/dashboard/SettingsPage.jsx';
 import { BookingsPage } from './pages/dashboard/BookingsPage.jsx';
+import { WaitlistPage } from './pages/dashboard/WaitlistPage.jsx';
 import { PlaceholderPage } from './pages/dashboard/PlaceholderPage.jsx';
 import { PublicBookingPage } from './pages/public/PublicBookingPage.jsx';
 import { ManageBookingPage } from './pages/public/ManageBookingPage.jsx';
+import { ClaimOfferPage } from './pages/public/ClaimOfferPage.jsx';
 
 export function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
         <Routes>
-          {/* Public Booking & Guest Management Pages */}
+          {/* Public Booking, Guest Management & Recovery Offer Pages */}
           <Route path="/book/:slug" element={<PublicBookingPage />} />
           <Route path="/appointments/:id/manage" element={<ManageBookingPage />} />
           <Route path="/guest/bookings/:id" element={<ManageBookingPage />} />
+          <Route path="/offers/:id" element={<ClaimOfferPage />} />
 
           {/* Public Auth Routes */}
           <Route path="/login" element={<LoginPage />} />
@@ -36,16 +39,7 @@ export function App() {
             <Route path="staff" element={<StaffPage />} />
             <Route path="settings" element={<SettingsPage />} />
             <Route path="bookings" element={<BookingsPage />} />
-            <Route
-              path="waitlist"
-              element={
-                <PlaceholderPage
-                  title="Smart Waitlist Recovery"
-                  subtitle="Cancellation outbox, candidate matching algorithm, and expiring offers"
-                  milestone="Milestone 3"
-                />
-              }
-            />
+            <Route path="waitlist" element={<WaitlistPage />} />
             <Route
               path="queue"
               element={

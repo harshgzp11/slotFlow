@@ -5,6 +5,7 @@ import businessRoutes from './business.routes.js';
 import serviceRoutes from './service.routes.js';
 import staffRoutes from './staff.routes.js';
 import bookingRoutes from './booking.routes.js';
+import waitlistRoutes from './waitlist.routes.js';
 
 const router = Router();
 
@@ -24,5 +25,6 @@ router.use('/businesses', businessRoutes);
 router.use('/services', serviceRoutes);
 router.use('/staff', staffRoutes);
 router.use('/bookings', bookingRoutes);
+router.use('/waitlist', waitlistRoutes);
 
 export default router;
