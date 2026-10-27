@@ -44,6 +44,8 @@ coverage/
 **/coverage/
 .nyc_output/
 .vitest/
+playwright-report/
+test-results/
 
 # IDE & Operating System Files
 .DS_Store

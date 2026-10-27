@@ -9,8 +9,12 @@
     "start": "node src/server.js",
     "worker": "node src/workers/recovery.worker.js",
     "test": "vitest run",
+    "test:unit": "vitest run tests/unit",
+    "test:integration": "vitest run tests/integration",
+    "test:concurrency": "vitest run tests/concurrency",
     "test:watch": "vitest",
-    "seed": "node src/scripts/seed.js"
+    "seed": "node src/scripts/seed.js",
+    "smoke": "node src/scripts/productionSmokeTest.js"
   },
   "dependencies": {
     "bcrypt": "^5.1.1",

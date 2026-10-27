@@ -187,6 +187,7 @@ export async function getAvailableSlots(params) {
           endTimeUtc: slotEndUtc,
           localStartTime: localStartTimeStr,
           localEndTime: localEndTimeStr,
+          displayTime: localStartTimeStr,
           staffId: staffMember._id,
           staffName: staffMember.displayName,
           serviceId: service._id,

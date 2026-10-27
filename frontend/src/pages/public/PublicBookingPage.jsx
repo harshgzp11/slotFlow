@@ -402,7 +402,7 @@ export function PublicBookingPage() {
                             : 'bg-white border border-slate-200 text-slate-700 hover:border-indigo-400 hover:bg-indigo-50/50'
                         }`}
                       >
-                        {slot.displayTime}
+                        {slot.displayTime || slot.localStartTime}
                         {slot.staffName && !selectedStaff && (
                           <div className="text-[10px] font-normal opacity-80 truncate">
                             {slot.staffName}
@@ -448,7 +448,7 @@ export function PublicBookingPage() {
               <p className="font-bold text-sm text-indigo-900">{selectedService?.name}</p>
               <div className="flex flex-wrap gap-x-4 gap-y-1 text-indigo-800">
                 <span>Date: <strong>{selectedDate}</strong></span>
-                <span>Time: <strong>{selectedSlot?.displayTime}</strong></span>
+                <span>Time: <strong>{selectedSlot?.displayTime || selectedSlot?.localStartTime}</strong></span>
                 <span>Duration: <strong>{selectedService?.durationMinutes} mins</strong></span>
                 <span>Price: <strong>${selectedService?.price}</strong></span>
               </div>
@@ -549,7 +549,7 @@ export function PublicBookingPage() {
               </div>
               <div className="flex justify-between border-b border-slate-200/60 pb-2">
                 <span className="text-slate-500">Start Time:</span>
-                <span className="font-bold text-slate-800">{selectedSlot?.displayTime}</span>
+                <span className="font-bold text-slate-800">{selectedSlot?.displayTime || selectedSlot?.localStartTime}</span>
               </div>
               <div className="flex justify-between border-b border-slate-200/60 pb-2">
                 <span className="text-slate-500">Customer:</span>

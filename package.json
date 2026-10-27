@@ -20,6 +20,12 @@
     "start": "npm run start --workspace=backend",
     "worker": "npm run worker --workspace=backend",
     "test": "npm run test --workspace=backend",
+    "test:unit": "npm run test:unit --workspace=backend",
+    "test:integration": "npm run test:integration --workspace=backend",
+    "test:concurrency": "npm run test:concurrency --workspace=backend",
+    "test:e2e": "playwright test",
+    "test:smoke": "node backend/src/scripts/productionSmokeTest.js",
+    "test:all": "npm test && npm run test:e2e && npm run test:smoke",
     "seed": "npm run seed --workspace=backend"
   },
   "keywords": [
@@ -31,5 +37,8 @@
     "esm"
   ],
   "author": "Harsh Srivastava",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "@playwright/test": "^1.64.1"
+  }
 }
