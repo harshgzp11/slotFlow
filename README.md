@@ -1,121 +1,138 @@
 # SlotFlow
 
-> **Smart Appointment Scheduling & Zero-Gap Cancellation Recovery SaaS**  
-> Built with modern JavaScript (ES Modules), MongoDB, Express, React, Node.js, Vite, and TailwindCSS.
+A smarter way to manage appointments, waitlists, and walk-in customers.
 
-[![JavaScript: ESM](https://img.shields.io/badge/Language-JavaScript%20ESM-f7df1e?logo=javascript&logoColor=black)](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Modules)
-[![Database: MongoDB](https://img.shields.io/badge/Database-MongoDB%20Mongoose-47A248?logo=mongodb&logoColor=white)](https://www.mongodb.com/)
-[![Tests: Vitest](https://img.shields.io/badge/Tests-13%20Passed%20%28100%25%29-brightgreen?logo=vitest&logoColor=white)](https://vitest.dev/)
-[![Frontend: React + Vite](https://img.shields.io/badge/Frontend-React%20%2B%20Vite-61DAFB?logo=react&logoColor=black)](https://vitejs.dev/)
+SlotFlow is an appointment scheduling and business operations web app built with the MERN stack. It helps service-based businesses manage bookings and staff schedules, while giving customers a way to find available appointments and join a waitlist.
 
----
+## Features
 
-## ⚡ Key Features
+- **Appointment booking** — view services and available appointment times.
+- **15-minute reservation slots** — represent booking time as small reservation cells to help prevent overlapping bookings.
+- **Cancellation recovery** — when an appointment is cancelled, eligible waitlist customers can be offered the newly available time.
+- **Waitlist matching** — consider customer date flexibility and preferred time of day.
+- **Staff operations** — manage appointment status and view the daily queue.
+- **Walk-in queue** — register walk-in customers and track their queue status.
+- **Business analytics** — view operational and booking metrics.
 
-* **15-Minute Atomic Slot Grid:** Every service interval (duration + pre/post buffers) is split into discrete 15-minute reservation cells protected by a MongoDB compound unique index (`{ businessId: 1, staffId: 1, slotStartTimeUtc: 1 }`). Completely eliminates double-booking race conditions with automatic HTTP 409 Conflict handling.
-* **Zero-Gap Cancellation Recovery:** When an appointment is cancelled, its slots are atomically converted to `RECOVERY_PENDING` holds in the same transaction. The vacancy is immediately protected from public snatches.
-* **Deterministic Waitlist Matching:** Background recovery workers match candidates by priority, date flexibility ($\pm N$ days), and time-of-day preferences, placing an exclusive hold with a countdown timer.
-* **Fenced Worker Leases:** Durable worker leases with lease-token fencing prevent stale workers from executing out-of-order state transitions.
-* **Walk-In Queue Management:** Integrated ticketing system (`Q-001`, `Q-002`) with real-time wait estimation and status tracking.
-* **Staff Operations & Analytics:** Linear appointment state machine (`CONFIRMED` $\to$ `CHECKED_IN` $\to$ `IN_SERVICE` $\to$ `COMPLETED` / `NO_SHOW`) alongside MongoDB aggregation pipelines for staff utilization and revenue recovery metrics.
+## Tech Stack
 
----
+| Area | Technologies |
+| :--- | :--- |
+| **Frontend** | React, Vite, React Router, Tailwind CSS |
+| **Backend** | Node.js, Express |
+| **Database** | MongoDB, Mongoose |
+| **Validation and sessions** | Zod, Express Session, connect-mongo |
+| **Testing** | Vitest, Supertest |
 
-## 🛠️ Tech Stack
+The project uses JavaScript ES Modules.
 
-* **Backend:** Node.js (ESM), Express.js, Mongoose 8, Express-Session (`connect-mongo`), Zod validation.
-* **Frontend:** React 18, Vite 5, React Router v6, TailwindCSS 3, Lucide React.
-* **Testing:** Vitest, Supertest, in-memory MongoDB replica set with ACID transactions.
+## Run Locally
 
----
+### 1. Requirements
 
-## 🚀 Quick Start
+- Node.js 20 or newer
+- npm 10 or newer
+- MongoDB configured as a replica set so database transactions are supported (you can use MongoDB Atlas or a local replica-set deployment)
 
-### 1. Prerequisites
-* Node.js >= 20 LTS (v24 verified)
-* npm >= 10
-* MongoDB connection URI (Atlas or local)
+### 2. Clone and install
 
-### 2. Installation
 ```bash
 git clone https://github.com/harshgzp11/slotFlow.git
 cd slotFlow
 npm install
 ```
 
-### 3. Environment Configuration
-Create a `.env` file in `backend/.env`:
+### 3. Configure environment variables
+
+Create `backend/.env` and add your local configuration:
+
 ```env
-PORT=5000
 NODE_ENV=development
+PORT=5000
 CLIENT_ORIGIN=http://localhost:5173
-MONGODB_URI=mongodb+srv://<username>:<password>@cluster0.mongodb.net/slotflow?retryWrites=true&w=majority
-SESSION_SECRET=slotflow_super_secret_session_key_minimum_32_chars
+MONGODB_URI=mongodb://127.0.0.1:27017/slotflow?replicaSet=rs0
+SESSION_SECRET=replace_this_with_a_random_secret_at_least_32_characters_long
 ```
 
-### 4. Seed Demo Data
-Populate the database with a complete demo workspace, services, specialists, and sample bookings:
+Update `MONGODB_URI` to match your MongoDB setup. If you use MongoDB Atlas, paste your Atlas connection URI instead.
+
+Keep `.env` files and real credentials out of Git. Use a unique, strong `SESSION_SECRET` outside local development.
+
+### 4. Create demo data
+
 ```bash
 npm run seed
 ```
-* **Demo Login:** `owner@slotflow.io`
-* **Demo Password:** `Password123!`
-* **Public Booking Link:** `http://localhost:5173/book/luxe-studio`
 
-### 5. Start the Application
-Run both backend and frontend from the root directory:
+The seed script creates a sample business, services, staff, bookings, waitlist entries, and walk-in queue tickets. It also resets selected demo records, so use it only with a development database.
+
+Demo login after seeding:
+- **Email:** `owner@slotflow.io`
+- **Password:** `Password123!`
+- **Public booking page:** [http://localhost:5173/book/luxe-studio](http://localhost:5173/book/luxe-studio)
+
+These credentials are for the local seeded demo only. Do not use them in a production deployment.
+
+### 5. Start the app
+
+Open two terminals from the project root.
+
+**Terminal 1 — backend:**
 ```bash
-# Terminal 1: Backend API (port 5000)
 npm run dev:backend
+```
 
-# Terminal 2: Run directly with node from backend/
-# cd backend && node index.js
-
-# Terminal 3: Frontend Web App (port 5173)
+**Terminal 2 — frontend:**
+```bash
 npm run dev:frontend
 ```
-* Open **[http://localhost:5173](http://localhost:5173)** in your browser.
 
----
+Then open [http://localhost:5173](http://localhost:5173).
 
-## 🧪 Testing
+## Testing and Build
 
-Run the automated test suite (unit, integration, concurrency, and tenant isolation):
+Run the backend tests:
 ```bash
 npm test
 ```
-* **6 test suites, 13 tests (100% passing)** with real transactional replication.
 
 Build the frontend for production:
 ```bash
 npm run build:frontend
 ```
 
----
+Test counts and build status are intentionally not hard-coded here because they can change as the project evolves.
 
-## 📡 Core API Endpoints
+## API Overview
 
-### Public Endpoints (`/api/v1/public`)
-| Method | Endpoint | Description |
-| :--- | :--- | :--- |
-| `GET` | `/businesses/:slug` | Business profile and catalog |
-| `GET` | `/availability` | Available 15-minute start slots |
-| `POST` | `/bookings` | Atomic slot reservation and booking |
-| `POST` | `/bookings/:id/cancel` | Cancel booking with zero-gap hold conversion |
-| `POST` | `/businesses/:slug/waitlist` | Join waitlist with date/time preferences |
-| `POST` | `/businesses/:slug/queue` | Walk-in intake with wait estimation |
-| `POST` | `/offers/:id/accept` | Claim waitlist recovery offer |
+The API is organized around public booking flows and staff operations. Core areas include:
+- Business and service information
+- Appointment availability, booking, and cancellation
+- Waitlist registration and recovery offers
+- Staff authentication and appointment status updates
+- Walk-in queue management
+- Business analytics
 
-### Staff Operations (`/api/v1`)
-| Method | Endpoint | Role | Description |
-| :--- | :--- | :--- | :--- |
-| `POST` | `/auth/login` | Public | Session authentication |
-| `GET` | `/bookings` | Staff | Filter bookings by date/staff/status |
-| `PATCH` | `/bookings/:id/status` | Staff | Advance appointment state machine |
-| `GET` | `/queue` | Staff | Live walk-in queue board |
-| `GET` | `/analytics/overview` | Staff | Real-time utilization & revenue metrics |
+The backend API uses the `/api/v1` route prefix. Check the backend source for the current route definitions. Detailed endpoint specifications are documented in [docs/API.md](docs/API.md).
 
----
+## Project Structure
 
-## 📄 License
-ISC
+```text
+slotFlow/
+├── backend/    # Express API, database models, services, and tests
+├── frontend/   # React application
+├── package.json
+└── README.md
+```
+
+## Current Status
+
+SlotFlow is an actively developed project. Features and behavior may change as development and testing continue. Review the code and run the test suite before using it with real business or customer data.
+
+## License
+
+This project is open source under the ISC License.
+
+## Author
+
+Created by Harsh Srivastava
