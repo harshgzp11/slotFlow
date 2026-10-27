@@ -131,7 +131,7 @@ SlotFlow is an actively developed project. Features and behavior may change as d
 
 ## License
 
-This project is open source under the ISC License.
+This project is open source.
 
 ## Author
 
