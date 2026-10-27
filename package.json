@@ -5,18 +5,21 @@
   "description": "SlotFlow — Smart scheduling and business operations SaaS with automated cancellation recovery",
   "type": "module",
   "workspaces": [
-    "server",
-    "client"
+    "backend",
+    "frontend"
   ],
   "scripts": {
-    "dev": "npm run dev --workspace=server",
-    "dev:server": "npm run dev --workspace=server",
-    "dev:client": "npm run dev --workspace=client",
-    "build": "npm run build --workspace=client",
-    "build:client": "npm run build --workspace=client",
-    "start": "npm run start --workspace=server",
-    "test": "npm run test --workspace=server",
-    "seed": "npm run seed --workspace=server"
+    "dev": "npm run dev --workspace=backend",
+    "dev:backend": "npm run dev --workspace=backend",
+    "dev:frontend": "npm run dev --workspace=frontend",
+    "dev:server": "npm run dev --workspace=backend",
+    "dev:client": "npm run dev --workspace=frontend",
+    "build": "npm run build --workspace=frontend",
+    "build:frontend": "npm run build --workspace=frontend",
+    "build:client": "npm run build --workspace=frontend",
+    "start": "npm run start --workspace=backend",
+    "test": "npm run test --workspace=backend",
+    "seed": "npm run seed --workspace=backend"
   },
   "keywords": [
     "saas",

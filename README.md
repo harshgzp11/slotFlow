@@ -334,7 +334,7 @@ npm install
 ```
 
 ### Step 2: Configure Environment Variables
-Create `.env` in `server/` (or copy from `server/.env.example`):
+Create `.env` in `backend/` (or copy from `backend/.env.example`):
 ```env
 PORT=5000
 NODE_ENV=development
@@ -359,10 +359,10 @@ This automatically provisions:
 In root directory:
 ```bash
 # Terminal 1: Run Backend API (Node.js ESM)
-npm run dev:server
+npm run dev:backend
 
 # Terminal 2: Run Frontend Web App (React + Vite)
-npm run dev:client
+npm run dev:frontend
 ```
 * **Frontend Dashboard & Public Booking:** `http://localhost:5173`
 * **Public Booking Link:** `http://localhost:5173/book/luxe-studio`
@@ -409,14 +409,14 @@ npm test
 
 ### Production Build Verification
 ```bash
-npm run build:client
+npm run build:frontend
 ```
 ```text
 ✓ 1547 modules transformed.
 dist/index.html                   1.04 kB │ gzip:  0.59 kB
 dist/assets/index-DZWfiOfN.css   29.12 kB │ gzip:  5.58 kB
 dist/assets/index-CE1gpUoP.js   307.30 kB │ gzip: 77.44 kB
-✓ built in 6.11s
+✓ built in 6.73s
 ```
 
 ---
