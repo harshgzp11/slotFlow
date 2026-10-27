@@ -1,8 +1,10 @@
 import { Router } from 'express';
+import publicRoutes from './public.routes';
 import authRoutes from './auth.routes';
 import businessRoutes from './business.routes';
 import serviceRoutes from './service.routes';
 import staffRoutes from './staff.routes';
+import bookingRoutes from './booking.routes';
 
 const router = Router();
 
@@ -16,9 +18,11 @@ router.get('/health', (_req, res) => {
   });
 });
 
+router.use('/public', publicRoutes);
 router.use('/auth', authRoutes);
 router.use('/businesses', businessRoutes);
 router.use('/services', serviceRoutes);
 router.use('/staff', staffRoutes);
+router.use('/bookings', bookingRoutes);
 
 export default router;
