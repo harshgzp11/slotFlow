@@ -1,0 +1,316 @@
+import mongoose from 'mongoose';
+import crypto from 'crypto';
+import { addMinutes } from 'date-fns';
+import { Business } from '../models/Business.js';
+import { Service } from '../models/Service.js';
+import { Staff } from '../models/Staff.js';
+import { Booking } from '../models/Booking.js';
+import { SlotReservation } from '../models/SlotReservation.js';
+import { RecoveryJob } from '../models/RecoveryJob.js';
+import { ConflictError, NotFoundError, UnauthorizedError, ValidationError } from '../middleware/errorHandler.js';
+
+/**
+ * Generates an array of discrete 15-minute start timestamps for the full booking block
+ * @param {Object} params
+ * @param {Date} params.startTimeUtc
+ * @param {number} params.durationMinutes
+ * @param {number} params.bufferBefore
+ * @param {number} params.bufferAfter
+ * @returns {Date[]}
+ */
+export function generateReservationCells(params) {
+  const { startTimeUtc, durationMinutes, bufferBefore, bufferAfter } = params;
+  const blockStartUtc = addMinutes(startTimeUtc, -bufferBefore);
+  const blockEndUtc = addMinutes(startTimeUtc, durationMinutes + bufferAfter);
+
+  const cells = [];
+  let current = new Date(blockStartUtc);
+
+  while (current.getTime() < blockEndUtc.getTime()) {
+    cells.push(new Date(current));
+    current = addMinutes(current, 15);
+  }
+
+  return cells;
+}
+
+/**
+ * Constant-time comparison between stored SHA-256 hash and incoming raw token
+ * @param {string} storedHash
+ * @param {string} incomingToken
+ * @returns {boolean}
+ */
+export function verifyActionToken(storedHash, incomingToken) {
+  const incomingHash = crypto.createHash('sha256').update(incomingToken).digest('hex');
+  const storedBuf = Buffer.from(storedHash, 'hex');
+  const incomingBuf = Buffer.from(incomingHash, 'hex');
+
+  if (storedBuf.length !== incomingBuf.length) {
+    return false;
+  }
+
+  return crypto.timingSafeEqual(storedBuf, incomingBuf);
+}
+
+/**
+ * Creates a confirmed booking and reserves 15-minute cells atomically under transaction
+ * @param {Object} params
+ */
+export async function createBooking(params) {
+  const { businessId, serviceId, staffId, startTimeUtc, customer, source = 'PUBLIC' } = params;
+
+  // 1. Fetch Service and Staff
+  const [business, service, staff] = await Promise.all([
+    Business.findOne({ _id: businessId, isActive: true }),
+    Service.findOne({ _id: serviceId, businessId, isActive: true }),
+    Staff.findOne({ _id: staffId, businessId, isActive: true })
+  ]);
+
+  if (!business) throw new NotFoundError('Business not found or inactive.');
+  if (!service) throw new NotFoundError('Service not found or inactive.');
+  if (!staff) throw new NotFoundError('Staff member not found or inactive.');
+
+  // Validate staff qualification
+  if (!service.qualifiedStaffIds.some((id) => id.equals(staff._id))) {
+    throw new ValidationError('Selected staff member is not qualified for this service.');
+  }
+
+  const { durationMinutes, bufferBefore, bufferAfter, price } = service;
+  const endTimeUtc = addMinutes(startTimeUtc, durationMinutes);
+
+  // 2. Generate 15-minute discrete reservation cells
+  const cellStartTimes = generateReservationCells({
+    startTimeUtc,
+    durationMinutes,
+    bufferBefore,
+    bufferAfter
+  });
+
+  const expectedCellCount = cellStartTimes.length;
+
+  // 3. Generate secure guest manage token
+  const rawManageToken = crypto.randomBytes(32).toString('hex');
+  const manageTokenHash = crypto.createHash('sha256').update(rawManageToken).digest('hex');
+  const manageTokenExpiresAt = addMinutes(endTimeUtc, 30 * 24 * 60);
+
+  // 4. ATOMIC TRANSACTION: Insert reservation cells and booking
+  const session = await mongoose.startSession();
+  try {
+    const booking = await session.withTransaction(async () => {
+      // Create Booking with immutable snapshots
+      const [newBooking] = await Booking.create(
+        [
+          {
+            businessId,
+            serviceId,
+            staffId,
+            customer,
+            startTimeUtc,
+            endTimeUtc,
+            status: 'CONFIRMED',
+            source,
+            priceSnapshot: price,
+            durationMinutesSnapshot: durationMinutes,
+            bufferBeforeSnapshot: bufferBefore,
+            bufferAfterSnapshot: bufferAfter,
+            reservationCellCountSnapshot: expectedCellCount,
+            manageTokenHash,
+            manageTokenExpiresAt
+          }
+        ],
+        { session }
+      );
+
+      // Reserve all 15-minute discrete cells under the compound unique index
+      const reservationDocs = cellStartTimes.map((cellTime) => ({
+        businessId,
+        staffId,
+        slotStartTimeUtc: cellTime,
+        reservationType: 'BOOKING',
+        bookingId: newBooking._id
+      }));
+
+      try {
+        await SlotReservation.insertMany(reservationDocs, { session });
+      } catch (err) {
+        if (err.code === 11000) {
+          throw new ConflictError(
+            'The selected time slot is no longer available. Please select another time.'
+          );
+        }
+        throw err;
+      }
+
+      return newBooking;
+    });
+
+    return { booking, rawManageToken };
+  } finally {
+    await session.endSession();
+  }
+}
+
+/**
+ * Cancels a booking with ZERO GAP: converts cells directly to RECOVERY_PENDING hold
+ * @param {Object} params
+ */
+export async function cancelBookingWithZeroGap(params) {
+  const { bookingId, businessId, reason, rawToken } = params;
+
+  const session = await mongoose.startSession();
+  try {
+    return await session.withTransaction(async () => {
+      const booking = await Booking.findOne({
+        _id: bookingId,
+        businessId
+      }).session(session);
+
+      if (!booking) {
+        throw new NotFoundError('Booking not found.');
+      }
+
+      if (booking.status !== 'CONFIRMED') {
+        throw new ConflictError(`Cannot cancel booking with current status: ${booking.status}`);
+      }
+
+      // If token provided (guest cancellation), verify it
+      if (rawToken) {
+        if (!verifyActionToken(booking.manageTokenHash, rawToken)) {
+          throw new UnauthorizedError('Invalid management token.');
+        }
+      }
+
+      // 1. Mark booking as CANCELLED
+      booking.status = 'CANCELLED';
+      booking.cancellationReason = reason || 'Customer requested cancellation';
+      booking.cancelledAtUtc = new Date();
+      await booking.save({ session });
+
+      // 2. Create durable RecoveryJob for outbox processing
+      const [recoveryJob] = await RecoveryJob.create(
+        [
+          {
+            businessId,
+            bookingId: booking._id,
+            vacatedInterval: {
+              staffId: booking.staffId,
+              serviceId: booking.serviceId,
+              startTimeUtc: booking.startTimeUtc,
+              endTimeUtc: booking.endTimeUtc,
+              vacatedDurationMinutes: booking.durationMinutesSnapshot
+            },
+            status: 'PENDING',
+            lockedUntil: null,
+            retryCount: 0
+          }
+        ],
+        { session }
+      );
+
+      // 3. ZERO GAP: Atomically convert BOOKING cells to RECOVERY_PENDING HOLD
+      const updateResult = await SlotReservation.updateMany(
+        {
+          businessId,
+          bookingId: booking._id,
+          reservationType: 'BOOKING'
+        },
+        {
+          $set: {
+            reservationType: 'HOLD',
+            holdType: 'RECOVERY_PENDING',
+            recoveryJobId: recoveryJob._id,
+            updatedAt: new Date()
+          },
+          $unset: { bookingId: 1 }
+        },
+        { session }
+      );
+
+      // 4. Strict cell count assertion based on immutable snapshot
+      if (updateResult.modifiedCount !== booking.reservationCellCountSnapshot) {
+        throw new ConflictError(
+          `Cancellation cell count mismatch: expected ${booking.reservationCellCountSnapshot}, converted ${updateResult.modifiedCount}. Transaction aborted.`
+        );
+      }
+
+      return booking;
+    });
+  } finally {
+    await session.endSession();
+  }
+}
+
+/**
+ * Reschedules a booking to a new start time
+ * @param {Object} params
+ */
+export async function rescheduleBooking(params) {
+  const { bookingId, businessId, newStartTimeUtc, rawToken } = params;
+
+  const session = await mongoose.startSession();
+  try {
+    return await session.withTransaction(async () => {
+      const booking = await Booking.findOne({
+        _id: bookingId,
+        businessId
+      }).session(session);
+
+      if (!booking) throw new NotFoundError('Booking not found.');
+      if (booking.status !== 'CONFIRMED') {
+        throw new ConflictError(`Cannot reschedule booking with status: ${booking.status}`);
+      }
+
+      if (rawToken && !verifyActionToken(booking.manageTokenHash, rawToken)) {
+        throw new UnauthorizedError('Invalid management token.');
+      }
+
+      const newEndTimeUtc = addMinutes(newStartTimeUtc, booking.durationMinutesSnapshot);
+
+      // 1. Generate new cells
+      const newCellTimes = generateReservationCells({
+        startTimeUtc: newStartTimeUtc,
+        durationMinutes: booking.durationMinutesSnapshot,
+        bufferBefore: booking.bufferBeforeSnapshot,
+        bufferAfter: booking.bufferAfterSnapshot
+      });
+
+      // 2. Release old cells
+      await SlotReservation.deleteMany(
+        {
+          businessId,
+          bookingId: booking._id
+        },
+        { session }
+      );
+
+      // 3. Reserve new cells
+      const newReservationDocs = newCellTimes.map((cellTime) => ({
+        businessId,
+        staffId: booking.staffId,
+        slotStartTimeUtc: cellTime,
+        reservationType: 'BOOKING',
+        bookingId: booking._id
+      }));
+
+      try {
+        await SlotReservation.insertMany(newReservationDocs, { session });
+      } catch (err) {
+        if (err.code === 11000) {
+          throw new ConflictError(
+            'The newly selected time slot is already booked. Please choose another time.'
+          );
+        }
+        throw err;
+      }
+
+      // 4. Update booking timestamps
+      booking.startTimeUtc = newStartTimeUtc;
+      booking.endTimeUtc = newEndTimeUtc;
+      await booking.save({ session });
+
+      return booking;
+    });
+  } finally {
+    await session.endSession();
+  }
+}

@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "description": "SlotFlow — Smart scheduling and business operations SaaS with automated cancellation recovery",
+  "type": "module",
   "workspaces": [
     "server",
     "client"
@@ -11,9 +12,9 @@
     "dev": "npm run dev --workspace=server",
     "dev:server": "npm run dev --workspace=server",
     "dev:client": "npm run dev --workspace=client",
-    "build": "npm run build --workspaces",
-    "build:server": "npm run build --workspace=server",
+    "build": "npm run build --workspace=client",
     "build:client": "npm run build --workspace=client",
+    "start": "npm run start --workspace=server",
     "test": "npm run test --workspace=server",
     "seed": "npm run seed --workspace=server"
   },
@@ -22,7 +23,8 @@
     "scheduling",
     "cancellation-recovery",
     "mern",
-    "typescript"
+    "javascript",
+    "esm"
   ],
   "author": "Harsh Srivastava",
   "license": "ISC"
