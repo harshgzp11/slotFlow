@@ -4,6 +4,12 @@ A smarter way to manage appointments, waitlists, and walk-in customers.
 
 SlotFlow is an appointment scheduling and business operations web app built with the MERN stack. It helps service-based businesses manage bookings and staff schedules, while giving customers a way to find available appointments and join a waitlist.
 
+## Live Links
+
+- **Frontend (Live App):** [https://slot-flow-tau.vercel.app](https://slot-flow-tau.vercel.app/)
+- **Backend API:** [https://slotflow-api.onrender.com](https://slotflow-api.onrender.com/)
+- **API Health Check:** [https://slotflow-api.onrender.com/api/v1/health](https://slotflow-api.onrender.com/api/v1/health)
+
 ## Features
 
 - **Appointment booking** — view services and available appointment times.
