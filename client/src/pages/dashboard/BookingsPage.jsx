@@ -88,6 +88,20 @@ export function BookingsPage() {
     }
   }
 
+  async function handleUpdateStatus(bookingId, targetStatus) {
+    setError(null);
+    try {
+      await apiRequest(`/bookings/${bookingId}/status`, {
+        method: 'PATCH',
+        body: JSON.stringify({ status: targetStatus })
+      });
+      await loadData();
+    } catch (err) {
+      setError(err.message || `Failed to update status to ${targetStatus}`);
+    }
+  }
+
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -279,15 +293,53 @@ export function BookingsPage() {
                       </td>
 
                       <td className="py-3.5 px-4 text-right">
-                        {isConfirmed && (
-                          <button
-                            type="button"
-                            onClick={() => setCancelBookingId(b._id)}
-                            className="px-2.5 py-1 text-xs text-rose-600 hover:text-rose-800 hover:bg-rose-50 rounded font-semibold border border-rose-200 transition-colors"
-                          >
-                            Cancel
-                          </button>
-                        )}
+                        <div className="flex items-center justify-end space-x-1.5">
+                          {b.status === 'CONFIRMED' && (
+                            <>
+                              <button
+                                type="button"
+                                onClick={() => handleUpdateStatus(b._id, 'CHECKED_IN')}
+                                className="px-2 py-0.5 text-[11px] bg-indigo-50 text-indigo-700 hover:bg-indigo-100 rounded font-bold border border-indigo-200 transition-colors"
+                              >
+                                Check In
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => handleUpdateStatus(b._id, 'NO_SHOW')}
+                                className="px-2 py-0.5 text-[11px] text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded font-semibold transition-colors"
+                              >
+                                No-Show
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => setCancelBookingId(b._id)}
+                                className="px-2 py-0.5 text-[11px] text-rose-600 hover:text-rose-800 hover:bg-rose-50 rounded font-semibold border border-rose-200 transition-colors"
+                              >
+                                Cancel
+                              </button>
+                            </>
+                          )}
+
+                          {b.status === 'CHECKED_IN' && (
+                            <button
+                              type="button"
+                              onClick={() => handleUpdateStatus(b._id, 'IN_SERVICE')}
+                              className="px-2.5 py-0.5 text-[11px] bg-amber-50 text-amber-800 hover:bg-amber-100 rounded font-bold border border-amber-300 transition-colors"
+                            >
+                              Start Service
+                            </button>
+                          )}
+
+                          {b.status === 'IN_SERVICE' && (
+                            <button
+                              type="button"
+                              onClick={() => handleUpdateStatus(b._id, 'COMPLETED')}
+                              className="px-2.5 py-0.5 text-[11px] bg-emerald-50 text-emerald-700 hover:bg-emerald-100 rounded font-bold border border-emerald-300 transition-colors"
+                            >
+                              Complete
+                            </button>
+                          )}
+                        </div>
                       </td>
                     </tr>
                   );

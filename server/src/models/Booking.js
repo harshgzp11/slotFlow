@@ -93,6 +93,19 @@ const bookingSchema = new Schema(
       required: true
     },
 
+    // State machine transition timestamps
+    checkedInAtUtc: {
+      type: Date
+    },
+    serviceStartedAtUtc: {
+      type: Date
+    },
+    completedAtUtc: {
+      type: Date
+    },
+    noShowAtUtc: {
+      type: Date
+    },
     cancellationReason: {
       type: String
     },
@@ -101,9 +114,15 @@ const bookingSchema = new Schema(
     }
   },
   {
-    timestamps: true
+    timestamps: true,
+    toJSON: { virtuals: true },
+    toObject: { virtuals: true }
   }
 );
+
+bookingSchema.virtual('totalPrice').get(function () {
+  return this.priceSnapshot;
+});
 
 bookingSchema.index({ businessId: 1, startTimeUtc: 1, status: 1 });
 bookingSchema.index({ businessId: 1, 'customer.email': 1 });

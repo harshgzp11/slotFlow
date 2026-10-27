@@ -11,6 +11,7 @@ import { StaffPage } from './pages/dashboard/StaffPage.jsx';
 import { SettingsPage } from './pages/dashboard/SettingsPage.jsx';
 import { BookingsPage } from './pages/dashboard/BookingsPage.jsx';
 import { WaitlistPage } from './pages/dashboard/WaitlistPage.jsx';
+import { AnalyticsPage } from './pages/dashboard/AnalyticsPage.jsx';
 import { PlaceholderPage } from './pages/dashboard/PlaceholderPage.jsx';
 import { PublicBookingPage } from './pages/public/PublicBookingPage.jsx';
 import { ManageBookingPage } from './pages/public/ManageBookingPage.jsx';
@@ -40,6 +41,7 @@ export function App() {
             <Route path="settings" element={<SettingsPage />} />
             <Route path="bookings" element={<BookingsPage />} />
             <Route path="waitlist" element={<WaitlistPage />} />
+            <Route path="analytics" element={<AnalyticsPage />} />
             <Route
               path="queue"
               element={
@@ -47,16 +49,6 @@ export function App() {
                   title="Walk-in Queue Management"
                   subtitle="FIFO customer queue, status transitions, and dynamic wait-time estimation"
                   milestone="Milestone 5"
-                />
-              }
-            />
-            <Route
-              path="analytics"
-              element={
-                <PlaceholderPage
-                  title="Business Analytics & Capacity"
-                  subtitle="Real utilization percentages, recovery rates, and aggregated revenue metrics"
-                  milestone="Milestone 4"
                 />
               }
             />

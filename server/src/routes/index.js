@@ -6,6 +6,7 @@ import serviceRoutes from './service.routes.js';
 import staffRoutes from './staff.routes.js';
 import bookingRoutes from './booking.routes.js';
 import waitlistRoutes from './waitlist.routes.js';
+import analyticsRoutes from './analytics.routes.js';
 
 const router = Router();
 
@@ -26,5 +27,6 @@ router.use('/services', serviceRoutes);
 router.use('/staff', staffRoutes);
 router.use('/bookings', bookingRoutes);
 router.use('/waitlist', waitlistRoutes);
+router.use('/analytics', analyticsRoutes);
 
 export default router;

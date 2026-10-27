@@ -270,3 +270,52 @@ export async function cancelStaffBooking(req, res, next) {
     next(error);
   }
 }
+
+const statusTransitionSchema = z.object({
+  status: z.enum(['CHECKED_IN', 'IN_SERVICE', 'COMPLETED', 'NO_SHOW'])
+});
+
+export async function updateBookingStatus(req, res, next) {
+  try {
+    const { id } = req.params;
+    const { status: targetStatus } = statusTransitionSchema.parse(req.body);
+
+    const booking = await Booking.findOne({ _id: id, businessId: req.business._id });
+    if (!booking) throw new NotFoundError('Booking not found.');
+
+    const current = booking.status;
+    const now = new Date();
+
+    // Enforce valid operational transitions
+    const validTransitions = {
+      CONFIRMED: ['CHECKED_IN', 'NO_SHOW'],
+      CHECKED_IN: ['IN_SERVICE', 'NO_SHOW'],
+      IN_SERVICE: ['COMPLETED']
+    };
+
+    if (!validTransitions[current] || !validTransitions[current].includes(targetStatus)) {
+      throw new ValidationError(
+        `Invalid status transition from "${current}" to "${targetStatus}". Allowed: ${
+          validTransitions[current]?.join(', ') || 'none'
+        }`
+      );
+    }
+
+    booking.status = targetStatus;
+    if (targetStatus === 'CHECKED_IN') booking.checkedInAtUtc = now;
+    if (targetStatus === 'IN_SERVICE') booking.serviceStartedAtUtc = now;
+    if (targetStatus === 'COMPLETED') booking.completedAtUtc = now;
+    if (targetStatus === 'NO_SHOW') booking.noShowAtUtc = now;
+
+    await booking.save();
+
+    res.status(200).json({
+      success: true,
+      message: `Appointment status updated to ${targetStatus}`,
+      data: { booking }
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
