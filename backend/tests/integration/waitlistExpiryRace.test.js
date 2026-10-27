@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach, vi, afterEach } from 'vitest';
 import crypto from 'crypto';
 import mongoose from 'mongoose';
 import { Business } from '../../src/models/Business.js';
@@ -11,11 +11,12 @@ import { WaitlistEntry } from '../../src/models/WaitlistEntry.js';
 import { WaitlistOffer } from '../../src/models/WaitlistOffer.js';
 import {
   acceptWaitlistOffer,
+  claimRecoveryJob,
   hashClaimToken
 } from '../../src/services/recovery.service.js';
 import { ConflictError } from '../../src/middleware/errorHandler.js';
 
-describe('Waitlist Offer Expiry Race Condition (Finding 3)', () => {
+describe('Waitlist Offer Expiry Race Condition (Finding 3 & Transaction Bug Fix)', () => {
   let business;
   let service;
   let staff;
@@ -113,8 +114,8 @@ describe('Waitlist Offer Expiry Race Condition (Finding 3)', () => {
     rawClaimToken = crypto.randomBytes(24).toString('hex');
     const claimTokenHash = hashClaimToken(rawClaimToken);
 
-    // Create offer that expires 50ms in the past (expired offer race condition simulation)
-    const pastExpiresAt = new Date(Date.now() - 500);
+    // Initial offer expires in the future (30 seconds)
+    const futureExpiresAt = new Date(Date.now() + 30000);
 
     offer = await WaitlistOffer.create({
       businessId: business._id,
@@ -129,7 +130,7 @@ describe('Waitlist Offer Expiry Race Condition (Finding 3)', () => {
         reservationCellCount: 2
       },
       claimTokenHash,
-      expiresAt: pastExpiresAt,
+      expiresAt: futureExpiresAt,
       status: 'PENDING',
       holdSlotReservationIds: [cell1._id, cell2._id]
     });
@@ -137,12 +138,29 @@ describe('Waitlist Offer Expiry Race Condition (Finding 3)', () => {
     // Link offer to hold cells
     await SlotReservation.updateMany(
       { _id: { $in: [cell1._id, cell2._id] } },
-      { $set: { holdOfferId: offer._id, holdExpiresAtUtc: pastExpiresAt } }
+      { $set: { holdOfferId: offer._id, holdExpiresAtUtc: futureExpiresAt } }
     );
   });
 
-  it('atomically rejects an expired offer inside acceptance transaction and rolls back holds safely', async () => {
-    // Attempting to accept an expired offer must throw ConflictError
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it('handles offer expiring between initial precheck and transactional check: commits expiry updates and throws 409', async () => {
+    // Intercept WaitlistOffer.findById: returns the still-valid offer to the initial precheck,
+    // but right after precheck runs, the offer in the DB expires before the transaction checks it!
+    const originalFindById = WaitlistOffer.findById.bind(WaitlistOffer);
+    vi.spyOn(WaitlistOffer, 'findById').mockImplementation(async (...args) => {
+      const result = await originalFindById(...args);
+      // Simulate offer expiring between initial precheck and transaction
+      await WaitlistOffer.updateOne(
+        { _id: offer._id },
+        { $set: { expiresAt: new Date(Date.now() - 5000) } }
+      );
+      return result;
+    });
+
+    // Attempting to accept the offer must throw ConflictError (translated to HTTP 409)
     await expect(
       acceptWaitlistOffer({
         offerId: offer._id,
@@ -150,15 +168,15 @@ describe('Waitlist Offer Expiry Race Condition (Finding 3)', () => {
       })
     ).rejects.toThrowError(ConflictError);
 
-    // 1. Verify offer status was updated to EXPIRED
+    // 1. Assert that the offer remains EXPIRED in the database (persisted by transaction commit)
     const updatedOffer = await WaitlistOffer.findById(offer._id);
     expect(updatedOffer.status).toBe('EXPIRED');
 
-    // 2. Verify candidate waitlist entry status was updated to EXPIRED
+    // 2. Assert that candidate waitlist entry status was updated and persisted as EXPIRED
     const updatedCandidate = await WaitlistEntry.findById(candidate._id);
     expect(updatedCandidate.status).toBe('EXPIRED');
 
-    // 3. Verify held reservation cells were safely reverted to RECOVERY_PENDING without losing hold
+    // 3. Assert that reservation cells safely returned to RECOVERY_PENDING without losing hold
     const updatedCells = await SlotReservation.find({
       _id: { $in: reservationCells.map((c) => c._id) }
     });
@@ -170,14 +188,21 @@ describe('Waitlist Offer Expiry Race Condition (Finding 3)', () => {
       expect(cell.holdOfferId).toBeUndefined();
     }
 
-    // 4. Verify RecoveryJob status was reset to PENDING and unlocked for reassignment
+    // 4. Assert that RecoveryJob became eligible for reassignment (status: PENDING, null locks)
     const updatedJob = await RecoveryJob.findById(recoveryJob._id);
     expect(updatedJob.status).toBe('PENDING');
     expect(updatedJob.lockedUntil).toBeNull();
     expect(updatedJob.leaseToken).toBeNull();
 
-    // 5. Verify NO confirmed booking was created
+    // Verify a worker can immediately claim it for reassignment
+    const claimedJob = await claimRecoveryJob('worker-reassignment-test');
+    expect(claimedJob).not.toBeNull();
+    expect(claimedJob._id.toString()).toBe(recoveryJob._id.toString());
+    expect(claimedJob.status).toBe('PROCESSING');
+
+    // 5. Assert that NO confirmed booking was created
     const createdBookings = await Booking.find({ businessId: business._id });
     expect(createdBookings.length).toBe(0);
   });
 });
+

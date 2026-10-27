@@ -308,7 +308,7 @@ export async function acceptWaitlistOffer(params) {
   // Execute atomic conversion transaction
   const session = await mongoose.startSession();
   try {
-    return await session.withTransaction(async () => {
+    const txResult = await session.withTransaction(async () => {
       const offer = await WaitlistOffer.findOne({
         _id: offerId,
         status: 'PENDING'
@@ -356,7 +356,8 @@ export async function acceptWaitlistOffer(params) {
           { session }
         );
 
-        throw new ConflictError('This recovery offer has expired and the slot was released for reassignment.');
+        // Return structured EXPIRED result to allow transaction to commit successfully
+        return { outcome: 'EXPIRED' };
       }
 
       const waitlistEntry = await WaitlistEntry.findById(offer.waitlistEntryId).session(session);
@@ -444,8 +445,17 @@ export async function acceptWaitlistOffer(params) {
         { session }
       );
 
-      return { booking, rawManageToken };
+      return { outcome: 'ACCEPTED', booking, rawManageToken };
     });
+
+    // Translate committed EXPIRED outcome into HTTP 409 Conflict response
+    if (txResult.outcome === 'EXPIRED') {
+      throw new ConflictError(
+        'This recovery offer has expired and the slot was released for reassignment.'
+      );
+    }
+
+    return { booking: txResult.booking, rawManageToken: txResult.rawManageToken };
   } finally {
     await session.endSession();
   }
