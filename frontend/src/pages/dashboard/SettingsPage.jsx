@@ -79,52 +79,52 @@ export function SettingsPage() {
 
       <form onSubmit={handleSave} className="space-y-6">
         {/* Workspace Identity */}
-        <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
-          <div className="flex items-center space-x-2 font-bold text-slate-900 text-base pb-3 border-b border-slate-100">
-            <Building className="w-5 h-5 text-indigo-600" />
+        <div className="bg-white p-6 sm:p-8 rounded-2xl border border-gray-100 shadow-[0_4px_25px_rgba(0,0,0,0.05)] space-y-4">
+          <div className="flex items-center space-x-2 font-bold text-slate-900 text-base pb-3 border-b border-gray-100">
+            <Building className="w-5 h-5 text-[#1e3a8a]" />
             <span>Business Identity</span>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Business Name</label>
+              <label className="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1.5">Business Name</label>
               <input
                 type="text"
                 required
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none"
+                className="w-full bg-[#f9fafb] border border-gray-200 rounded-lg py-2.5 px-3.5 text-sm text-gray-900 placeholder-gray-400 focus:bg-white focus:border-[#1e3a8a] focus:ring-1 focus:ring-[#1e3a8a] focus:outline-none transition-all"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Public Slug (Handle)</label>
+              <label className="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1.5">Public Slug (Handle)</label>
               <input
                 type="text"
                 disabled
                 value={activeBusiness?.slug || ''}
-                className="w-full px-3 py-2 border border-slate-200 bg-slate-50 text-slate-500 rounded-lg text-sm cursor-not-allowed"
+                className="w-full bg-gray-50 border border-gray-200 text-gray-400 rounded-lg py-2.5 px-3.5 text-sm cursor-not-allowed font-mono"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">Description</label>
+            <label className="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1.5">Description</label>
             <textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               rows={2}
-              className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none"
+              className="w-full bg-[#f9fafb] border border-gray-200 rounded-lg py-2.5 px-3.5 text-sm text-gray-900 placeholder-gray-400 focus:bg-white focus:border-[#1e3a8a] focus:ring-1 focus:ring-[#1e3a8a] focus:outline-none transition-all"
             />
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Timezone</label>
+              <label className="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1.5">Timezone</label>
               <select
                 value={timezone}
                 onChange={(e) => setTimezone(e.target.value)}
-                className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white focus:ring-2 focus:ring-indigo-500 outline-none"
+                className="w-full bg-[#f9fafb] border border-gray-200 rounded-lg py-2.5 px-3 text-sm text-gray-900 focus:bg-white focus:border-[#1e3a8a] focus:ring-1 focus:ring-[#1e3a8a] focus:outline-none transition-all"
               >
                 <option value="Asia/Kolkata">Asia/Kolkata (IST)</option>
                 <option value="America/New_York">America/New_York (EST)</option>
@@ -135,11 +135,11 @@ export function SettingsPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Currency</label>
+              <label className="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1.5">Currency</label>
               <select
                 value={currency}
                 onChange={(e) => setCurrency(e.target.value)}
-                className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white focus:ring-2 focus:ring-indigo-500 outline-none"
+                className="w-full bg-[#f9fafb] border border-gray-200 rounded-lg py-2.5 px-3 text-sm text-gray-900 focus:bg-white focus:border-[#1e3a8a] focus:ring-1 focus:ring-[#1e3a8a] focus:outline-none transition-all"
               >
                 <option value="USD">USD ($)</option>
                 <option value="INR">INR (₹)</option>
@@ -151,15 +151,15 @@ export function SettingsPage() {
         </div>
 
         {/* Scheduling Policies */}
-        <div className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
-          <div className="flex items-center space-x-2 font-bold text-slate-900 text-base pb-3 border-b border-slate-100">
-            <ShieldCheck className="w-5 h-5 text-indigo-600" />
+        <div className="bg-white p-6 sm:p-8 rounded-2xl border border-gray-100 shadow-[0_4px_25px_rgba(0,0,0,0.05)] space-y-4">
+          <div className="flex items-center space-x-2 font-bold text-slate-900 text-base pb-3 border-b border-gray-100">
+            <ShieldCheck className="w-5 h-5 text-[#1e3a8a]" />
             <span>Booking & Cancellation Policies</span>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">
+              <label className="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1.5">
                 Min Advance Notice
               </label>
               <div className="flex items-center">
@@ -168,7 +168,7 @@ export function SettingsPage() {
                   min={0}
                   value={minNoticeHours}
                   onChange={(e) => setMinNoticeHours(Number(e.target.value))}
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none"
+                  className="w-full bg-[#f9fafb] border border-gray-200 rounded-lg py-2.5 px-3 text-sm text-gray-900 focus:bg-white focus:border-[#1e3a8a] focus:ring-1 focus:ring-[#1e3a8a] focus:outline-none transition-all"
                 />
                 <span className="text-xs text-slate-500 ml-2">hours</span>
               </div>
@@ -176,7 +176,7 @@ export function SettingsPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">
+              <label className="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1.5">
                 Max Booking Horizon
               </label>
               <div className="flex items-center">
@@ -185,7 +185,7 @@ export function SettingsPage() {
                   min={1}
                   value={maxHorizonDays}
                   onChange={(e) => setMaxHorizonDays(Number(e.target.value))}
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none"
+                  className="w-full bg-[#f9fafb] border border-gray-200 rounded-lg py-2.5 px-3 text-sm text-gray-900 focus:bg-white focus:border-[#1e3a8a] focus:ring-1 focus:ring-[#1e3a8a] focus:outline-none transition-all"
                 />
                 <span className="text-xs text-slate-500 ml-2">days</span>
               </div>
@@ -193,7 +193,7 @@ export function SettingsPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">
+              <label className="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1.5">
                 Cancellation Cutoff
               </label>
               <div className="flex items-center">
@@ -202,7 +202,7 @@ export function SettingsPage() {
                   min={0}
                   value={cancelCutoffHours}
                   onChange={(e) => setCancelCutoffHours(Number(e.target.value))}
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none"
+                  className="w-full bg-[#f9fafb] border border-gray-200 rounded-lg py-2.5 px-3 text-sm text-gray-900 focus:bg-white focus:border-[#1e3a8a] focus:ring-1 focus:ring-[#1e3a8a] focus:outline-none transition-all"
                 />
                 <span className="text-xs text-slate-500 ml-2">hours</span>
               </div>
@@ -215,7 +215,7 @@ export function SettingsPage() {
           <button
             type="submit"
             disabled={isSaving}
-            className="inline-flex items-center space-x-2 px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg shadow-sm transition-colors disabled:opacity-50"
+            className="inline-flex items-center space-x-2 px-6 py-2.5 bg-[#1e3a8a] hover:bg-[#172554] text-white font-medium rounded-lg shadow-sm transition-colors disabled:opacity-50 text-sm"
           >
             {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
             <span>Save Settings</span>

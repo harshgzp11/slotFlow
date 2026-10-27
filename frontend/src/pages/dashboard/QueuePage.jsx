@@ -126,7 +126,7 @@ export function QueuePage() {
 
         <button
           onClick={() => setIsModalOpen(true)}
-          className="inline-flex items-center space-x-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-lg shadow-sm transition-colors"
+          className="inline-flex items-center space-x-2 px-4 py-2 bg-[#1e3a8a] hover:bg-[#172554] text-white text-xs font-medium rounded-lg shadow-sm transition-colors"
         >
           <Plus className="w-4 h-4" />
           <span>Add Walk-In Customer</span>
@@ -143,7 +143,7 @@ export function QueuePage() {
       {/* Queue Columns Overview */}
       {isLoading ? (
         <div className="py-20 flex justify-center text-slate-400">
-          <Loader2 className="w-8 h-8 animate-spin text-indigo-600" />
+          <Loader2 className="w-8 h-8 animate-spin text-[#1e3a8a]" />
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -160,11 +160,11 @@ export function QueuePage() {
               {waitingTickets.map((t) => (
                 <div
                   key={t._id}
-                  className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-3 hover:border-slate-300 transition-colors"
+                  className="bg-white p-4 rounded-2xl border border-gray-100 shadow-[0_4px_25px_rgba(0,0,0,0.05)] space-y-3 hover:border-gray-200 transition-colors"
                 >
                   <div className="flex items-start justify-between">
                     <div>
-                      <span className="font-mono text-base font-black text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded">
+                      <span className="font-mono text-base font-black text-[#1e3a8a] bg-blue-50 px-2 py-0.5 rounded">
                         {t.ticketNumber}
                       </span>
                       <h3 className="font-bold text-slate-900 text-sm mt-1.5">{t.customer?.name}</h3>
@@ -184,7 +184,7 @@ export function QueuePage() {
 
                   <div className="text-xs text-slate-600 flex items-center justify-between pt-2 border-t border-slate-100">
                     <span className="flex items-center space-x-1">
-                      <Scissors className="w-3.5 h-3.5 text-indigo-500" />
+                      <Scissors className="w-3.5 h-3.5 text-[#1e3a8a]" />
                       <span>{t.serviceId?.name}</span>
                     </span>
                     <span className="text-slate-400">
@@ -203,7 +203,7 @@ export function QueuePage() {
                     <button
                       type="button"
                       onClick={() => handleStatusTransition(t._id, 'CALLED')}
-                      className="px-3 py-1 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-lg transition-colors flex items-center space-x-1 shadow-sm"
+                      className="px-3 py-1 bg-[#1e3a8a] hover:bg-[#172554] text-white font-medium text-xs rounded-lg transition-colors flex items-center space-x-1 shadow-sm"
                     >
                       <Volume2 className="w-3.5 h-3.5" />
                       <span>Call Next</span>
@@ -213,7 +213,7 @@ export function QueuePage() {
               ))}
 
               {waitingTickets.length === 0 && (
-                <div className="p-8 bg-slate-50 border border-dashed border-slate-200 rounded-xl text-center text-xs text-slate-400">
+                <div className="p-8 bg-white border border-dashed border-gray-200 rounded-2xl text-center text-xs text-gray-400 shadow-[0_4px_25px_rgba(0,0,0,0.05)]">
                   No customers currently waiting
                 </div>
               )}
@@ -224,7 +224,7 @@ export function QueuePage() {
           <div className="space-y-3">
             <div className="flex items-center justify-between pb-2 border-b border-slate-200">
               <div className="flex items-center space-x-2 font-bold text-slate-800 text-sm">
-                <span className="w-2.5 h-2.5 rounded-full bg-indigo-500"></span>
+                <span className="w-2.5 h-2.5 rounded-full bg-[#1e3a8a]"></span>
                 <span>Called & Arriving ({calledTickets.length})</span>
               </div>
             </div>
@@ -233,18 +233,18 @@ export function QueuePage() {
               {calledTickets.map((t) => (
                 <div
                   key={t._id}
-                  className="bg-white p-4 rounded-xl border border-indigo-200 bg-indigo-50/20 shadow-sm space-y-3"
+                  className="bg-white p-4 rounded-2xl border border-blue-100 bg-blue-50/20 shadow-[0_4px_25px_rgba(0,0,0,0.05)] space-y-3"
                 >
                   <div className="flex items-start justify-between">
                     <div>
-                      <span className="font-mono text-base font-black text-indigo-700 bg-indigo-100 px-2 py-0.5 rounded">
+                      <span className="font-mono text-base font-black text-[#1e3a8a] bg-blue-100 px-2 py-0.5 rounded">
                         {t.ticketNumber}
                       </span>
                       <h3 className="font-bold text-slate-900 text-sm mt-1.5">{t.customer?.name}</h3>
                       <p className="text-xs text-slate-500 mt-0.5">{t.customer?.phone}</p>
                     </div>
 
-                    <span className="text-[11px] font-bold text-indigo-700 bg-indigo-100 px-2 py-0.5 rounded">
+                    <span className="text-[11px] font-bold text-[#1e3a8a] bg-blue-100 px-2 py-0.5 rounded">
                       CALLED
                     </span>
                   </div>
@@ -295,7 +295,7 @@ export function QueuePage() {
               {inServiceTickets.map((t) => (
                 <div
                   key={t._id}
-                  className="bg-white p-4 rounded-xl border border-emerald-200 shadow-sm space-y-3"
+                  className="bg-white p-4 rounded-2xl border border-emerald-100 shadow-[0_4px_25px_rgba(0,0,0,0.05)] space-y-3"
                 >
                   <div className="flex items-start justify-between">
                     <div>
@@ -315,7 +315,7 @@ export function QueuePage() {
                     <button
                       type="button"
                       onClick={() => handleStatusTransition(t._id, 'COMPLETED')}
-                      className="px-3 py-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-lg transition-colors flex items-center space-x-1 shadow-sm"
+                      className="px-3 py-1 bg-emerald-600 hover:bg-emerald-700 text-white font-medium text-xs rounded-lg transition-colors flex items-center space-x-1 shadow-sm"
                     >
                       <Check className="w-3.5 h-3.5" />
                       <span>Complete Appointment</span>
@@ -325,7 +325,7 @@ export function QueuePage() {
               ))}
 
               {inServiceTickets.length === 0 && (
-                <div className="p-8 bg-slate-50 border border-dashed border-slate-200 rounded-xl text-center text-xs text-slate-400">
+                <div className="p-8 bg-white border border-dashed border-gray-200 rounded-2xl text-center text-xs text-gray-400 shadow-[0_4px_25px_rgba(0,0,0,0.05)]">
                   No customers currently in service
                 </div>
               )}
@@ -337,39 +337,39 @@ export function QueuePage() {
       {/* Add Walk-in Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl shadow-xl border border-slate-200 max-w-md w-full p-6 space-y-4">
-            <h2 className="text-lg font-bold text-slate-900">Add Walk-in Customer</h2>
-            <p className="text-xs text-slate-500">
+          <div className="bg-white rounded-2xl shadow-xl border border-gray-100 max-w-md w-full p-6 sm:p-8 space-y-4">
+            <h2 className="text-xl font-light text-gray-800 tracking-tight">Add Walk-in Customer</h2>
+            <p className="text-xs text-gray-500">
               Register a customer arrival at the front desk for immediate FIFO queue placement.
             </p>
 
             <form onSubmit={handleAddWalkIn} className="space-y-4">
               <div>
-                <label className="block text-xs font-medium text-slate-700 mb-1">Customer Name</label>
+                <label className="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1.5">Customer Name</label>
                 <input
                   type="text"
                   required
                   value={customerName}
                   onChange={(e) => setCustomerName(e.target.value)}
                   placeholder="Marcus Aurelius"
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-indigo-500 outline-none"
+                  className="w-full bg-[#f9fafb] border border-gray-200 rounded-lg py-2.5 px-3.5 text-xs text-gray-900 placeholder-gray-400 focus:bg-white focus:border-[#1e3a8a] focus:ring-1 focus:ring-[#1e3a8a] focus:outline-none transition-all"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-slate-700 mb-1">Phone Number</label>
+                <label className="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1.5">Phone Number</label>
                 <input
                   type="tel"
                   required
                   value={customerPhone}
                   onChange={(e) => setCustomerPhone(e.target.value)}
                   placeholder="+1 (555) 987-6543"
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-indigo-500 outline-none"
+                  className="w-full bg-[#f9fafb] border border-gray-200 rounded-lg py-2.5 px-3.5 text-xs text-gray-900 placeholder-gray-400 focus:bg-white focus:border-[#1e3a8a] focus:ring-1 focus:ring-[#1e3a8a] focus:outline-none transition-all"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-slate-700 mb-1">
+                <label className="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1.5">
                   Email Address (Optional)
                 </label>
                 <input
@@ -377,17 +377,17 @@ export function QueuePage() {
                   value={customerEmail}
                   onChange={(e) => setCustomerEmail(e.target.value)}
                   placeholder="marcus@example.com"
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-indigo-500 outline-none"
+                  className="w-full bg-[#f9fafb] border border-gray-200 rounded-lg py-2.5 px-3.5 text-xs text-gray-900 placeholder-gray-400 focus:bg-white focus:border-[#1e3a8a] focus:ring-1 focus:ring-[#1e3a8a] focus:outline-none transition-all"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-slate-700 mb-1">Select Service</label>
+                <label className="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1.5">Select Service</label>
                 <select
                   required
                   value={selectedServiceId}
                   onChange={(e) => setSelectedServiceId(e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs bg-white focus:ring-2 focus:ring-indigo-500 outline-none"
+                  className="w-full bg-[#f9fafb] border border-gray-200 rounded-lg py-2 px-3 text-xs text-gray-900 focus:bg-white focus:border-[#1e3a8a] focus:ring-1 focus:ring-[#1e3a8a] focus:outline-none transition-all"
                 >
                   {services.map((svc) => (
                     <option key={svc._id} value={svc._id}>
@@ -398,13 +398,13 @@ export function QueuePage() {
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-slate-700 mb-1">
+                <label className="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1.5">
                   Preferred Specialist (Optional)
                 </label>
                 <select
                   value={selectedStaffId}
                   onChange={(e) => setSelectedStaffId(e.target.value)}
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs bg-white focus:ring-2 focus:ring-indigo-500 outline-none"
+                  className="w-full bg-[#f9fafb] border border-gray-200 rounded-lg py-2 px-3 text-xs text-gray-900 focus:bg-white focus:border-[#1e3a8a] focus:ring-1 focus:ring-[#1e3a8a] focus:outline-none transition-all"
                 >
                   <option value="">Any Available Specialist</option>
                   {staffList.map((st) => (
@@ -415,18 +415,18 @@ export function QueuePage() {
                 </select>
               </div>
 
-              <div className="flex items-center justify-end space-x-3 pt-3 border-t border-slate-100">
+              <div className="flex items-center justify-end space-x-3 pt-3 border-t border-gray-100">
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="px-4 py-2 text-xs font-semibold text-slate-600 hover:text-slate-800 rounded-lg hover:bg-slate-100 transition-colors"
+                  className="px-4 py-2 text-xs font-medium text-slate-600 hover:text-slate-800 rounded-lg hover:bg-slate-100 transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs rounded-lg shadow-sm transition-colors disabled:opacity-50 flex items-center space-x-1.5"
+                  className="px-4 py-2 bg-[#1e3a8a] hover:bg-[#172554] text-white font-medium text-xs rounded-lg shadow-sm transition-colors disabled:opacity-50 flex items-center space-x-1.5"
                 >
                   {isSubmitting && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
                   <span>Add to Queue</span>

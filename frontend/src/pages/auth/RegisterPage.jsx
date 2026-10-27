@@ -63,7 +63,7 @@ export const RegisterPage = () => {
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="Full Name"
-              className="w-full bg-[#f9fafb] border border-gray-200 rounded-lg py-3 pl-11 pr-4 text-sm text-gray-900 placeholder-gray-400 focus:bg-white focus:border-gray-900 focus:ring-1 focus:ring-gray-900 focus:outline-none transition-all"
+              className="w-full bg-[#f9fafb] border border-gray-200 rounded-lg py-3 pl-11 pr-4 text-sm text-gray-900 placeholder-gray-400 focus:bg-white focus:border-[#1e3a8a] focus:ring-1 focus:ring-[#1e3a8a] focus:outline-none transition-all"
             />
           </div>
 
@@ -75,7 +75,7 @@ export const RegisterPage = () => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Email Address"
-              className="w-full bg-[#f9fafb] border border-gray-200 rounded-lg py-3 pl-11 pr-4 text-sm text-gray-900 placeholder-gray-400 focus:bg-white focus:border-gray-900 focus:ring-1 focus:ring-gray-900 focus:outline-none transition-all"
+              className="w-full bg-[#f9fafb] border border-gray-200 rounded-lg py-3 pl-11 pr-4 text-sm text-gray-900 placeholder-gray-400 focus:bg-white focus:border-[#1e3a8a] focus:ring-1 focus:ring-[#1e3a8a] focus:outline-none transition-all"
             />
           </div>
 
@@ -87,7 +87,7 @@ export const RegisterPage = () => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Password"
-              className="w-full bg-[#f9fafb] border border-gray-200 rounded-lg py-3 pl-11 pr-11 text-sm text-gray-900 placeholder-gray-400 focus:bg-white focus:border-gray-900 focus:ring-1 focus:ring-gray-900 focus:outline-none transition-all"
+              className="w-full bg-[#f9fafb] border border-gray-200 rounded-lg py-3 pl-11 pr-11 text-sm text-gray-900 placeholder-gray-400 focus:bg-white focus:border-[#1e3a8a] focus:ring-1 focus:ring-[#1e3a8a] focus:outline-none transition-all"
             />
             <button
               type="button"
@@ -110,14 +110,14 @@ export const RegisterPage = () => {
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
               placeholder="Phone Number"
-              className="w-full bg-[#f9fafb] border border-gray-200 rounded-lg py-3 pl-11 pr-4 text-sm text-gray-900 placeholder-gray-400 focus:bg-white focus:border-gray-900 focus:ring-1 focus:ring-gray-900 focus:outline-none transition-all"
+              className="w-full bg-[#f9fafb] border border-gray-200 rounded-lg py-3 pl-11 pr-4 text-sm text-gray-900 placeholder-gray-400 focus:bg-white focus:border-[#1e3a8a] focus:ring-1 focus:ring-[#1e3a8a] focus:outline-none transition-all"
             />
           </div>
 
           <button
             type="submit"
             disabled={isSubmitting}
-            className="w-full py-3 px-4 bg-black hover:bg-neutral-800 text-white font-medium rounded-lg text-sm transition-colors shadow-sm flex items-center justify-center gap-2 disabled:opacity-50 mt-6"
+            className="w-full py-3 px-4 bg-[#1e3a8a] hover:bg-[#172554] text-white font-medium rounded-lg text-sm transition-colors shadow-sm flex items-center justify-center gap-2 disabled:opacity-50 mt-6"
           >
             {isSubmitting ? (
               <Loader2 className="w-4 h-4 animate-spin" />
@@ -129,7 +129,7 @@ export const RegisterPage = () => {
 
         <div className="mt-6 text-center text-sm text-gray-500">
           Already have an account?{' '}
-          <Link to="/login" className="font-semibold text-black hover:underline">
+          <Link to="/login" className="font-semibold text-[#1e3a8a] hover:underline">
             Log in here
           </Link>
         </div>

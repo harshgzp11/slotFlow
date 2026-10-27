@@ -88,7 +88,7 @@ export function WaitlistPage() {
         <button
           onClick={handleTriggerEngine}
           disabled={isRunningEngine}
-          className="inline-flex items-center space-x-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-lg shadow-sm transition-colors disabled:opacity-50"
+          className="inline-flex items-center space-x-2 px-4 py-2 bg-[#1e3a8a] hover:bg-[#172554] text-white text-xs font-medium rounded-lg shadow-sm transition-colors disabled:opacity-50"
         >
           {isRunningEngine ? (
             <Loader2 className="w-4 h-4 animate-spin" />
@@ -114,11 +114,11 @@ export function WaitlistPage() {
       )}
 
       {/* Filter Bar */}
-      <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-wrap gap-3">
+      <div className="bg-white p-4 rounded-2xl border border-gray-100 shadow-[0_4px_25px_rgba(0,0,0,0.05)] flex flex-wrap gap-3">
         <select
           value={selectedStatus}
           onChange={(e) => setSelectedStatus(e.target.value)}
-          className="px-3 py-2 border border-slate-300 rounded-lg text-xs bg-white focus:ring-2 focus:ring-indigo-500 outline-none"
+          className="bg-[#f9fafb] border border-gray-200 rounded-lg py-2 px-3 text-xs text-gray-900 focus:bg-white focus:border-[#1e3a8a] focus:ring-1 focus:ring-[#1e3a8a] focus:outline-none transition-all"
         >
           <option value="">All Statuses</option>
           <option value="WAITING">WAITING</option>
@@ -131,7 +131,7 @@ export function WaitlistPage() {
         <select
           value={selectedServiceId}
           onChange={(e) => setSelectedServiceId(e.target.value)}
-          className="px-3 py-2 border border-slate-300 rounded-lg text-xs bg-white focus:ring-2 focus:ring-indigo-500 outline-none"
+          className="bg-[#f9fafb] border border-gray-200 rounded-lg py-2 px-3 text-xs text-gray-900 focus:bg-white focus:border-[#1e3a8a] focus:ring-1 focus:ring-[#1e3a8a] focus:outline-none transition-all"
         >
           <option value="">All Services</option>
           {services.map((svc) => (
@@ -145,18 +145,18 @@ export function WaitlistPage() {
       {/* Waitlist Table */}
       {isLoading ? (
         <div className="py-12 flex justify-center text-slate-400">
-          <Loader2 className="w-8 h-8 animate-spin text-indigo-600" />
+          <Loader2 className="w-8 h-8 animate-spin text-[#1e3a8a]" />
         </div>
       ) : entries.length === 0 ? (
-        <div className="text-center py-12 bg-white rounded-xl border border-dashed border-slate-300 p-8">
+        <div className="text-center py-12 bg-white rounded-2xl border border-dashed border-gray-200 p-8 shadow-[0_4px_25px_rgba(0,0,0,0.05)]">
           <Sparkles className="w-10 h-10 text-slate-400 mx-auto mb-3" />
-          <h3 className="text-base font-bold text-slate-900">No Waitlist Candidates</h3>
-          <p className="text-xs text-slate-500 mt-1 max-w-sm mx-auto">
+          <h3 className="text-base font-light text-gray-800">No Waitlist Candidates</h3>
+          <p className="text-xs text-gray-500 mt-1 max-w-sm mx-auto">
             Customers who join your public waitlist when slots are full will appear here.
           </p>
         </div>
       ) : (
-        <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-[0_4px_25px_rgba(0,0,0,0.05)] overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
               <thead className="bg-slate-50 border-b border-slate-200 text-slate-500 uppercase tracking-wider font-semibold">
@@ -187,7 +187,7 @@ export function WaitlistPage() {
 
                       <td className="py-3.5 px-4">
                         <p className="font-semibold text-slate-800 flex items-center space-x-1">
-                          <Scissors className="w-3.5 h-3.5 text-indigo-600" />
+                          <Scissors className="w-3.5 h-3.5 text-[#1e3a8a]" />
                           <span>{entry.serviceId?.name || 'Any Treatment'}</span>
                         </p>
                         <p className="text-slate-500 text-[11px]">
@@ -201,7 +201,7 @@ export function WaitlistPage() {
                           {end.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
                         </p>
                         {entry.flexibleDays > 0 && (
-                          <span className="text-[10px] text-indigo-600 font-semibold bg-indigo-50 px-1.5 py-0.5 rounded">
+                          <span className="text-[10px] text-[#1e3a8a] font-semibold bg-blue-50 px-1.5 py-0.5 rounded">
                             ±{entry.flexibleDays}d flexibility
                           </span>
                         )}
@@ -227,7 +227,7 @@ export function WaitlistPage() {
                               : isConfirmed
                               ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
                               : isWaiting
-                              ? 'bg-indigo-50 text-indigo-700 border border-indigo-200'
+                              ? 'bg-blue-50 text-[#1e3a8a] border border-blue-200'
                               : 'bg-slate-100 text-slate-700'
                           }`}
                         >

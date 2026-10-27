@@ -94,7 +94,7 @@ export function ServicesPage() {
         </div>
         <button
           onClick={handleOpenModal}
-          className="inline-flex items-center space-x-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-lg shadow-sm transition-colors"
+          className="inline-flex items-center space-x-2 px-4 py-2 bg-[#1e3a8a] hover:bg-[#172554] text-white text-sm font-medium rounded-lg shadow-sm transition-colors"
         >
           <Plus className="w-4 h-4" />
           <span>Add Service</span>
@@ -111,18 +111,18 @@ export function ServicesPage() {
       {/* Services List */}
       {isLoading ? (
         <div className="py-12 flex justify-center text-slate-400">
-          <Loader2 className="w-8 h-8 animate-spin text-indigo-600" />
+          <Loader2 className="w-8 h-8 animate-spin text-[#1e3a8a]" />
         </div>
       ) : services.length === 0 ? (
-        <div className="text-center py-12 bg-white rounded-xl border border-dashed border-slate-300 p-8">
+        <div className="text-center py-12 bg-white rounded-2xl border border-dashed border-gray-200 p-8 shadow-[0_4px_25px_rgba(0,0,0,0.05)]">
           <Scissors className="w-10 h-10 text-slate-400 mx-auto mb-3" />
-          <h3 className="text-base font-bold text-slate-900">No Services Yet</h3>
-          <p className="text-sm text-slate-500 mt-1 max-w-sm mx-auto mb-4">
+          <h3 className="text-base font-light text-gray-800">No Services Yet</h3>
+          <p className="text-sm text-gray-500 mt-1 max-w-sm mx-auto mb-4">
             Add your first service to enable appointment availability generation on your booking page.
           </p>
           <button
             onClick={handleOpenModal}
-            className="inline-flex items-center space-x-2 px-4 py-2 bg-indigo-600 text-white text-sm font-semibold rounded-lg shadow-sm"
+            className="inline-flex items-center space-x-2 px-4 py-2 bg-[#1e3a8a] hover:bg-[#172554] text-white text-sm font-medium rounded-lg shadow-sm transition-colors"
           >
             <Plus className="w-4 h-4" />
             <span>Create First Service</span>
@@ -133,7 +133,7 @@ export function ServicesPage() {
           {services.map((service) => (
             <div
               key={service._id}
-              className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between hover:border-slate-300 transition-colors"
+              className="bg-white p-5 rounded-2xl border border-gray-100 shadow-[0_4px_25px_rgba(0,0,0,0.05)] flex flex-col justify-between hover:border-gray-200 transition-colors"
             >
               <div>
                 <div className="flex items-start justify-between">
@@ -178,45 +178,49 @@ export function ServicesPage() {
       {/* Add Service Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl shadow-xl border border-slate-200 max-w-lg w-full p-6 overflow-y-auto max-h-[90vh]">
-            <h2 className="text-xl font-bold text-slate-900 mb-1">Add New Service</h2>
-            <p className="text-xs text-slate-500 mb-4">
+          <div className="bg-white rounded-2xl shadow-xl border border-gray-100 max-w-lg w-full p-6 sm:p-8 overflow-y-auto max-h-[90vh]">
+            <h2 className="text-xl font-light text-gray-800 tracking-tight mb-1">Add New Service</h2>
+            <p className="text-xs text-gray-500 mb-5">
               All durations and buffer intervals must be multiples of 15 minutes.
             </p>
 
             <form onSubmit={handleSave} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Service Name</label>
+                <label className="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1.5">
+                  Service Name
+                </label>
                 <input
                   type="text"
                   required
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="Signature Haircut & Styling"
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none"
+                  className="w-full bg-[#f9fafb] border border-gray-200 rounded-lg py-2.5 px-3.5 text-sm text-gray-900 placeholder-gray-400 focus:bg-white focus:border-[#1e3a8a] focus:ring-1 focus:ring-[#1e3a8a] focus:outline-none transition-all"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Description</label>
+                <label className="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1.5">
+                  Description
+                </label>
                 <textarea
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   rows={2}
                   placeholder="Includes consultation, precision cut, wash, and style."
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none"
+                  className="w-full bg-[#f9fafb] border border-gray-200 rounded-lg py-2.5 px-3.5 text-sm text-gray-900 placeholder-gray-400 focus:bg-white focus:border-[#1e3a8a] focus:ring-1 focus:ring-[#1e3a8a] focus:outline-none transition-all"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">
+                  <label className="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1.5">
                     Duration (Minutes)
                   </label>
                   <select
                     value={durationMinutes}
                     onChange={(e) => setDurationMinutes(Number(e.target.value))}
-                    className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white focus:ring-2 focus:ring-indigo-500 outline-none"
+                    className="w-full bg-[#f9fafb] border border-gray-200 rounded-lg py-2.5 px-3 text-sm text-gray-900 focus:bg-white focus:border-[#1e3a8a] focus:ring-1 focus:ring-[#1e3a8a] focus:outline-none transition-all"
                   >
                     <option value={15}>15 mins</option>
                     <option value={30}>30 mins</option>
@@ -229,7 +233,9 @@ export function ServicesPage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">Price ($)</label>
+                  <label className="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1.5">
+                    Price ($)
+                  </label>
                   <input
                     type="number"
                     min={0}
@@ -237,20 +243,20 @@ export function ServicesPage() {
                     required
                     value={price}
                     onChange={(e) => setPrice(Number(e.target.value))}
-                    className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none"
+                    className="w-full bg-[#f9fafb] border border-gray-200 rounded-lg py-2.5 px-3.5 text-sm text-gray-900 focus:bg-white focus:border-[#1e3a8a] focus:ring-1 focus:ring-[#1e3a8a] focus:outline-none transition-all"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">
+                  <label className="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1.5">
                     Buffer Before (Setup)
                   </label>
                   <select
                     value={bufferBefore}
                     onChange={(e) => setBufferBefore(Number(e.target.value))}
-                    className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white focus:ring-2 focus:ring-indigo-500 outline-none"
+                    className="w-full bg-[#f9fafb] border border-gray-200 rounded-lg py-2.5 px-3 text-sm text-gray-900 focus:bg-white focus:border-[#1e3a8a] focus:ring-1 focus:ring-[#1e3a8a] focus:outline-none transition-all"
                   >
                     <option value={0}>0 mins</option>
                     <option value={15}>15 mins</option>
@@ -259,13 +265,13 @@ export function ServicesPage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">
+                  <label className="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1.5">
                     Buffer After (Cleanup)
                   </label>
                   <select
                     value={bufferAfter}
                     onChange={(e) => setBufferAfter(Number(e.target.value))}
-                    className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm bg-white focus:ring-2 focus:ring-indigo-500 outline-none"
+                    className="w-full bg-[#f9fafb] border border-gray-200 rounded-lg py-2.5 px-3 text-sm text-gray-900 focus:bg-white focus:border-[#1e3a8a] focus:ring-1 focus:ring-[#1e3a8a] focus:outline-none transition-all"
                   >
                     <option value={0}>0 mins</option>
                     <option value={15}>15 mins</option>
@@ -277,10 +283,10 @@ export function ServicesPage() {
               {/* Staff Qualification selector */}
               {staff.length > 0 && (
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1.5">
+                  <label className="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1.5">
                     Qualified Staff Members
                   </label>
-                  <div className="space-y-1.5 max-h-32 overflow-y-auto border border-slate-200 rounded-lg p-2.5">
+                  <div className="space-y-1.5 max-h-32 overflow-y-auto border border-gray-200 rounded-lg p-2.5 bg-[#f9fafb]">
                     {staff.map((s) => {
                       const isSelected = selectedStaffIds.includes(s._id);
                       return (
@@ -288,11 +294,11 @@ export function ServicesPage() {
                           key={s._id}
                           onClick={() => toggleStaff(s._id)}
                           className={`flex items-center justify-between px-3 py-1.5 rounded-md text-xs cursor-pointer select-none transition-colors ${
-                            isSelected ? 'bg-indigo-50 text-indigo-700 font-semibold' : 'text-slate-600 hover:bg-slate-50'
+                            isSelected ? 'bg-blue-50 text-[#1e3a8a] font-semibold' : 'text-slate-600 hover:bg-slate-50'
                           }`}
                         >
                           <span>{s.displayName}</span>
-                          {isSelected && <Check className="w-3.5 h-3.5 text-indigo-600" />}
+                          {isSelected && <Check className="w-3.5 h-3.5 text-[#1e3a8a]" />}
                         </div>
                       );
                     })}
@@ -300,7 +306,7 @@ export function ServicesPage() {
                 </div>
               )}
 
-              <div className="flex items-center justify-end space-x-3 pt-4 border-t border-slate-100">
+              <div className="flex items-center justify-end space-x-3 pt-4 border-t border-gray-100">
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
@@ -311,7 +317,7 @@ export function ServicesPage() {
                 <button
                   type="submit"
                   disabled={isSaving}
-                  className="px-5 py-2 text-sm text-white bg-indigo-600 hover:bg-indigo-700 font-semibold rounded-lg shadow-sm transition-colors disabled:opacity-50 flex items-center space-x-1.5"
+                  className="px-5 py-2 text-sm text-white bg-[#1e3a8a] hover:bg-[#172554] font-medium rounded-lg shadow-sm transition-colors disabled:opacity-50 flex items-center space-x-1.5"
                 >
                   {isSaving && <Loader2 className="w-4 h-4 animate-spin" />}
                   <span>Save Service</span>

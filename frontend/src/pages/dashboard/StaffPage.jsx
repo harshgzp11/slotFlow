@@ -106,7 +106,7 @@ export function StaffPage() {
         </div>
         <button
           onClick={handleOpenModal}
-          className="inline-flex items-center space-x-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-lg shadow-sm transition-colors"
+          className="inline-flex items-center space-x-2 px-4 py-2 bg-[#1e3a8a] hover:bg-[#172554] text-white text-sm font-medium rounded-lg shadow-sm transition-colors"
         >
           <Plus className="w-4 h-4" />
           <span>Add Staff Member</span>
@@ -123,18 +123,18 @@ export function StaffPage() {
       {/* Staff List */}
       {isLoading ? (
         <div className="py-12 flex justify-center text-slate-400">
-          <Loader2 className="w-8 h-8 animate-spin text-indigo-600" />
+          <Loader2 className="w-8 h-8 animate-spin text-[#1e3a8a]" />
         </div>
       ) : staffList.length === 0 ? (
-        <div className="text-center py-12 bg-white rounded-xl border border-dashed border-slate-300 p-8">
+        <div className="text-center py-12 bg-white rounded-2xl border border-dashed border-gray-200 p-8 shadow-[0_4px_25px_rgba(0,0,0,0.05)]">
           <UserCheck className="w-10 h-10 text-slate-400 mx-auto mb-3" />
-          <h3 className="text-base font-bold text-slate-900">No Staff Members Yet</h3>
-          <p className="text-sm text-slate-500 mt-1 max-w-sm mx-auto mb-4">
+          <h3 className="text-base font-light text-gray-800">No Staff Members Yet</h3>
+          <p className="text-sm text-gray-500 mt-1 max-w-sm mx-auto mb-4">
             Add team members and define their weekly working hours so slots can be booked.
           </p>
           <button
             onClick={handleOpenModal}
-            className="inline-flex items-center space-x-2 px-4 py-2 bg-indigo-600 text-white text-sm font-semibold rounded-lg shadow-sm"
+            className="inline-flex items-center space-x-2 px-4 py-2 bg-[#1e3a8a] hover:bg-[#172554] text-white text-sm font-medium rounded-lg shadow-sm transition-colors"
           >
             <Plus className="w-4 h-4" />
             <span>Add First Staff Provider</span>
@@ -145,7 +145,7 @@ export function StaffPage() {
           {staffList.map((member) => (
             <div
               key={member._id}
-              className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex flex-col justify-between hover:border-slate-300 transition-colors"
+              className="bg-white p-5 rounded-2xl border border-gray-100 shadow-[0_4px_25px_rgba(0,0,0,0.05)] flex flex-col justify-between hover:border-gray-200 transition-colors"
             >
               <div>
                 <div className="flex items-start justify-between">
@@ -188,7 +188,7 @@ export function StaffPage() {
                     <div
                       key={d.dayOfWeek}
                       className={`py-1 rounded text-[10px] font-bold ${
-                        d.isWorking ? 'bg-indigo-50 text-indigo-700 border border-indigo-200' : 'bg-slate-50 text-slate-400'
+                        d.isWorking ? 'bg-blue-50 text-[#1e3a8a] border border-blue-200' : 'bg-slate-50 text-slate-400'
                       }`}
                       title={`${DAYS_OF_WEEK[d.dayOfWeek]}: ${d.isWorking ? `${d.shiftStart}-${d.shiftEnd}` : 'Off'}`}
                     >
@@ -205,27 +205,29 @@ export function StaffPage() {
       {/* Add Staff Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl shadow-xl border border-slate-200 max-w-xl w-full p-6 overflow-y-auto max-h-[90vh]">
-            <h2 className="text-xl font-bold text-slate-900 mb-1">Add Staff Provider</h2>
-            <p className="text-xs text-slate-500 mb-4">
+          <div className="bg-white rounded-2xl shadow-xl border border-gray-100 max-w-xl w-full p-6 sm:p-8 overflow-y-auto max-h-[90vh]">
+            <h2 className="text-xl font-light text-gray-800 tracking-tight mb-1">Add Staff Provider</h2>
+            <p className="text-xs text-gray-500 mb-5">
               Configure working shifts and qualified treatments for this staff member.
             </p>
 
             <form onSubmit={handleSave} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Provider Name</label>
+                <label className="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1.5">
+                  Provider Name
+                </label>
                 <input
                   type="text"
                   required
                   value={displayName}
                   onChange={(e) => setDisplayName(e.target.value)}
                   placeholder="Elena Rostova"
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none"
+                  className="w-full bg-[#f9fafb] border border-gray-200 rounded-lg py-2.5 px-3.5 text-sm text-gray-900 placeholder-gray-400 focus:bg-white focus:border-[#1e3a8a] focus:ring-1 focus:ring-[#1e3a8a] focus:outline-none transition-all"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">
+                <label className="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1.5">
                   Email Address (Optional)
                 </label>
                 <input
@@ -233,29 +235,29 @@ export function StaffPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="elena@luxestudio.com"
-                  className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 outline-none"
+                  className="w-full bg-[#f9fafb] border border-gray-200 rounded-lg py-2.5 px-3.5 text-sm text-gray-900 placeholder-gray-400 focus:bg-white focus:border-[#1e3a8a] focus:ring-1 focus:ring-[#1e3a8a] focus:outline-none transition-all"
                 />
               </div>
 
               {/* Weekly Schedule Settings */}
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-2">
+                <label className="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-2">
                   Weekly Schedule & Hours
                 </label>
-                <div className="space-y-2 border border-slate-200 rounded-lg p-3 max-h-52 overflow-y-auto">
+                <div className="space-y-2 border border-gray-200 rounded-lg p-3 max-h-52 overflow-y-auto bg-[#f9fafb]">
                   {weeklySchedule.map((day) => (
                     <div
                       key={day.dayOfWeek}
-                      className="flex items-center justify-between text-xs py-1 border-b border-slate-100 last:border-0"
+                      className="flex items-center justify-between text-xs py-1.5 border-b border-gray-200/60 last:border-0"
                     >
                       <label className="flex items-center space-x-2 w-28 cursor-pointer select-none">
                         <input
                           type="checkbox"
                           checked={day.isWorking}
                           onChange={() => handleDayToggle(day.dayOfWeek)}
-                          className="rounded text-indigo-600 focus:ring-indigo-500"
+                          className="rounded text-[#1e3a8a] focus:ring-[#1e3a8a]"
                         />
-                        <span className={day.isWorking ? 'font-semibold text-slate-900' : 'text-slate-400'}>
+                        <span className={day.isWorking ? 'font-medium text-gray-900' : 'text-gray-400'}>
                           {DAYS_OF_WEEK[day.dayOfWeek]}
                         </span>
                       </label>
@@ -268,20 +270,20 @@ export function StaffPage() {
                             onChange={(e) =>
                               handleScheduleChange(day.dayOfWeek, 'shiftStart', e.target.value)
                             }
-                            className="px-2 py-1 border border-slate-300 rounded text-xs"
+                            className="px-2 py-1 bg-white border border-gray-200 rounded text-xs focus:border-[#1e3a8a] focus:outline-none"
                           />
-                          <span className="text-slate-400">to</span>
+                          <span className="text-gray-400">to</span>
                           <input
                             type="time"
                             value={day.shiftEnd}
                             onChange={(e) =>
                               handleScheduleChange(day.dayOfWeek, 'shiftEnd', e.target.value)
                             }
-                            className="px-2 py-1 border border-slate-300 rounded text-xs"
+                            className="px-2 py-1 bg-white border border-gray-200 rounded text-xs focus:border-[#1e3a8a] focus:outline-none"
                           />
                         </div>
                       ) : (
-                        <span className="text-slate-400 italic">Day Off</span>
+                        <span className="text-gray-400 italic">Day Off</span>
                       )}
                     </div>
                   ))}
@@ -291,10 +293,10 @@ export function StaffPage() {
               {/* Service Qualifications */}
               {services.length > 0 && (
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1.5">
+                  <label className="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1.5">
                     Qualified Treatments
                   </label>
-                  <div className="space-y-1.5 max-h-28 overflow-y-auto border border-slate-200 rounded-lg p-2.5">
+                  <div className="space-y-1.5 max-h-28 overflow-y-auto border border-gray-200 rounded-lg p-2.5 bg-[#f9fafb]">
                     {services.map((s) => {
                       const isSelected = selectedServiceIds.includes(s._id);
                       return (
@@ -302,11 +304,11 @@ export function StaffPage() {
                           key={s._id}
                           onClick={() => toggleService(s._id)}
                           className={`flex items-center justify-between px-3 py-1.5 rounded-md text-xs cursor-pointer select-none transition-colors ${
-                            isSelected ? 'bg-indigo-50 text-indigo-700 font-semibold' : 'text-slate-600 hover:bg-slate-50'
+                            isSelected ? 'bg-blue-50 text-[#1e3a8a] font-semibold' : 'text-slate-600 hover:bg-slate-50'
                           }`}
                         >
                           <span>{s.name} ({s.durationMinutes}m)</span>
-                          {isSelected && <Check className="w-3.5 h-3.5 text-indigo-600" />}
+                          {isSelected && <Check className="w-3.5 h-3.5 text-[#1e3a8a]" />}
                         </div>
                       );
                     })}
@@ -314,7 +316,7 @@ export function StaffPage() {
                 </div>
               )}
 
-              <div className="flex items-center justify-end space-x-3 pt-4 border-t border-slate-100">
+              <div className="flex items-center justify-end space-x-3 pt-4 border-t border-gray-100">
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
@@ -325,7 +327,7 @@ export function StaffPage() {
                 <button
                   type="submit"
                   disabled={isSaving}
-                  className="px-5 py-2 text-sm text-white bg-indigo-600 hover:bg-indigo-700 font-semibold rounded-lg shadow-sm transition-colors disabled:opacity-50 flex items-center space-x-1.5"
+                  className="px-5 py-2 text-sm text-white bg-[#1e3a8a] hover:bg-[#172554] font-medium rounded-lg shadow-sm transition-colors disabled:opacity-50 flex items-center space-x-1.5"
                 >
                   {isSaving && <Loader2 className="w-4 h-4 animate-spin" />}
                   <span>Save Provider</span>

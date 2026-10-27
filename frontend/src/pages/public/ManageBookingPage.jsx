@@ -78,10 +78,10 @@ export function ManageBookingPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-[#f3f4f6] flex items-center justify-center p-4">
         <div className="flex flex-col items-center space-y-3">
-          <Loader2 className="w-8 h-8 animate-spin text-indigo-600" />
-          <p className="text-sm font-medium text-slate-500">Loading appointment details...</p>
+          <Loader2 className="w-8 h-8 animate-spin text-[#1e3a8a]" />
+          <p className="text-sm font-medium text-gray-500">Loading appointment details...</p>
         </div>
       </div>
     );
@@ -89,16 +89,16 @@ export function ManageBookingPage() {
 
   if (error && !booking) {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
-        <div className="bg-white p-8 rounded-2xl shadow-sm border border-slate-200 max-w-md w-full text-center">
+      <div className="min-h-screen bg-[#f3f4f6] flex items-center justify-center p-4">
+        <div className="bg-white p-8 rounded-2xl shadow-[0_4px_25px_rgba(0,0,0,0.05)] border border-gray-100 max-w-md w-full text-center">
           <div className="w-12 h-12 rounded-full bg-rose-50 text-rose-600 flex items-center justify-center mx-auto mb-4">
             <ShieldAlert className="w-6 h-6" />
           </div>
-          <h2 className="text-xl font-bold text-slate-900 mb-2">Access Denied</h2>
-          <p className="text-sm text-slate-500 mb-6">{error}</p>
+          <h2 className="text-xl font-bold text-gray-900 mb-2">Access Denied</h2>
+          <p className="text-sm text-gray-500 mb-6">{error}</p>
           <Link
             to="/login"
-            className="inline-flex items-center px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-semibold hover:bg-indigo-700 transition-colors"
+            className="inline-flex items-center px-4 py-2.5 bg-[#1e3a8a] text-white rounded-lg text-sm font-medium hover:bg-[#172554] transition-colors shadow-sm"
           >
             Return to SlotFlow
           </Link>
@@ -113,18 +113,18 @@ export function ManageBookingPage() {
   const isConfirmed = booking.status === 'CONFIRMED';
 
   return (
-    <div className="min-h-screen bg-slate-50 py-10 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-[#f3f4f6] py-10 px-4 sm:px-6 lg:px-8">
       <div className="max-w-2xl mx-auto space-y-6">
         {/* Navigation / Header */}
         <div className="flex items-center justify-between">
           <Link
             to={`/book/${booking.businessId?.slug}`}
-            className="inline-flex items-center space-x-1.5 text-xs font-semibold text-slate-500 hover:text-slate-800"
+            className="inline-flex items-center space-x-1.5 text-xs font-semibold text-gray-500 hover:text-gray-800 transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
             <span>Visit {booking.businessId?.name} Booking Page</span>
           </Link>
-          <span className="text-xs text-slate-400">Appointment Management Portal</span>
+          <span className="text-xs text-gray-400">Appointment Management Portal</span>
         </div>
 
         {cancelSuccessMsg && (
@@ -142,72 +142,72 @@ export function ManageBookingPage() {
         )}
 
         {/* Booking Card */}
-        <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 sm:p-8 space-y-6">
-          <div className="flex items-start justify-between pb-4 border-b border-slate-100">
+        <div className="bg-white rounded-2xl shadow-[0_4px_25px_rgba(0,0,0,0.05)] border border-gray-100 p-6 sm:p-8 space-y-6">
+          <div className="flex items-start justify-between pb-4 border-b border-gray-100">
             <div>
               <div className="flex items-center space-x-2 mb-1">
-                <h1 className="text-xl font-bold text-slate-900">{booking.businessId?.name}</h1>
+                <h1 className="text-xl font-bold text-gray-900">{booking.businessId?.name}</h1>
                 <span
                   className={`text-xs px-2.5 py-0.5 rounded-full font-bold ${
                     isCancelled
                       ? 'bg-rose-50 text-rose-700 border border-rose-200'
                       : isConfirmed
                       ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                      : 'bg-slate-100 text-slate-700'
+                      : 'bg-gray-100 text-gray-700'
                   }`}
                 >
                   {booking.status}
                 </span>
               </div>
-              <p className="text-xs text-slate-500">
-                Confirmation ID: <span className="font-mono text-slate-700">{booking._id}</span>
+              <p className="text-xs text-gray-500">
+                Confirmation ID: <span className="font-mono text-gray-700">{booking._id}</span>
               </p>
             </div>
 
             <div className="text-right">
-              <span className="text-lg font-bold text-slate-900">${booking.totalPrice}</span>
-              <p className="text-[10px] text-slate-400">Due at arrival</p>
+              <span className="text-lg font-bold text-gray-900">${booking.totalPrice}</span>
+              <p className="text-[10px] text-gray-400">Due at arrival</p>
             </div>
           </div>
 
           {/* Details Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-            <div className="p-3.5 bg-slate-50 rounded-xl space-y-1">
-              <span className="text-slate-400 font-medium">Service</span>
-              <p className="font-bold text-slate-800 text-sm flex items-center space-x-1.5">
-                <Scissors className="w-4 h-4 text-indigo-600" />
+            <div className="p-3.5 bg-[#f9fafb] border border-gray-100 rounded-xl space-y-1">
+              <span className="text-gray-400 font-medium">Service</span>
+              <p className="font-bold text-gray-800 text-sm flex items-center space-x-1.5">
+                <Scissors className="w-4 h-4 text-[#1e3a8a]" />
                 <span>{booking.serviceId?.name || 'Selected Service'}</span>
               </p>
-              <p className="text-slate-500">
+              <p className="text-gray-500">
                 Duration: {booking.durationMinutesSnapshot || booking.serviceId?.durationMinutes} mins
               </p>
             </div>
 
-            <div className="p-3.5 bg-slate-50 rounded-xl space-y-1">
-              <span className="text-slate-400 font-medium">Assigned Specialist</span>
-              <p className="font-bold text-slate-800 text-sm flex items-center space-x-1.5">
-                <User className="w-4 h-4 text-indigo-600" />
+            <div className="p-3.5 bg-[#f9fafb] border border-gray-100 rounded-xl space-y-1">
+              <span className="text-gray-400 font-medium">Assigned Specialist</span>
+              <p className="font-bold text-gray-800 text-sm flex items-center space-x-1.5">
+                <User className="w-4 h-4 text-[#1e3a8a]" />
                 <span>{booking.staffId?.displayName || 'Assigned Staff'}</span>
               </p>
-              <p className="text-slate-500">{booking.staffId?.email || 'Dedicated Provider'}</p>
+              <p className="text-gray-500">{booking.staffId?.email || 'Dedicated Provider'}</p>
             </div>
 
-            <div className="p-3.5 bg-slate-50 rounded-xl space-y-1">
-              <span className="text-slate-400 font-medium">Date & Time</span>
-              <p className="font-bold text-slate-800 text-sm flex items-center space-x-1.5">
-                <Calendar className="w-4 h-4 text-indigo-600" />
+            <div className="p-3.5 bg-[#f9fafb] border border-gray-100 rounded-xl space-y-1">
+              <span className="text-gray-400 font-medium">Date & Time</span>
+              <p className="font-bold text-gray-800 text-sm flex items-center space-x-1.5">
+                <Calendar className="w-4 h-4 text-[#1e3a8a]" />
                 <span>{startTime.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' })}</span>
               </p>
-              <p className="text-slate-500">
+              <p className="text-gray-500">
                 {startTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} –{' '}
                 {endTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
               </p>
             </div>
 
-            <div className="p-3.5 bg-slate-50 rounded-xl space-y-1">
-              <span className="text-slate-400 font-medium">Customer Information</span>
-              <p className="font-bold text-slate-800 text-sm">{booking.customer?.name}</p>
-              <p className="text-slate-500">
+            <div className="p-3.5 bg-[#f9fafb] border border-gray-100 rounded-xl space-y-1">
+              <span className="text-gray-400 font-medium">Customer Information</span>
+              <p className="font-bold text-gray-800 text-sm">{booking.customer?.name}</p>
+              <p className="text-gray-500">
                 {booking.customer?.email} • {booking.customer?.phone}
               </p>
             </div>
@@ -215,8 +215,8 @@ export function ManageBookingPage() {
 
           {/* Cancellation section */}
           {isConfirmed && (
-            <div className="pt-4 border-t border-slate-100 flex items-center justify-between">
-              <p className="text-xs text-slate-500">
+            <div className="pt-4 border-t border-gray-100 flex items-center justify-between">
+              <p className="text-xs text-gray-500">
                 Need to change plans? You can cancel your appointment online.
               </p>
               <button
@@ -242,21 +242,21 @@ export function ManageBookingPage() {
 
         {/* Cancellation Confirmation Modal */}
         {isCancelModalOpen && (
-          <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4">
-            <div className="bg-white rounded-2xl shadow-xl border border-slate-200 max-w-md w-full p-6 space-y-4">
+          <div className="fixed inset-0 z-50 bg-gray-900/40 backdrop-blur-sm flex items-center justify-center p-4">
+            <div className="bg-white rounded-2xl shadow-xl border border-gray-100 max-w-md w-full p-6 space-y-4">
               <div className="w-12 h-12 rounded-full bg-rose-50 text-rose-600 flex items-center justify-center mx-auto">
                 <XCircle className="w-6 h-6" />
               </div>
               <div className="text-center">
-                <h3 className="text-lg font-bold text-slate-900">Cancel Appointment?</h3>
-                <p className="text-xs text-slate-500 mt-1">
+                <h3 className="text-lg font-bold text-gray-900">Cancel Appointment?</h3>
+                <p className="text-xs text-gray-500 mt-1">
                   Are you sure you want to cancel your appointment? Your reserved time will be released immediately.
                 </p>
               </div>
 
               <form onSubmit={handleCancelBooking} className="space-y-4">
                 <div>
-                  <label className="block text-xs font-medium text-slate-700 mb-1">
+                  <label className="block text-xs font-medium text-gray-700 mb-1">
                     Reason for Cancellation (Optional)
                   </label>
                   <textarea
@@ -264,7 +264,7 @@ export function ManageBookingPage() {
                     value={cancelReason}
                     onChange={(e) => setCancelReason(e.target.value)}
                     placeholder="Schedule conflict, feeling unwell, etc."
-                    className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-rose-500 outline-none"
+                    className="w-full px-3.5 py-2.5 bg-[#f9fafb] border border-gray-200 rounded-lg text-xs text-gray-900 placeholder-gray-400 focus:bg-white focus:border-[#1e3a8a] focus:ring-1 focus:ring-[#1e3a8a] outline-none transition-all"
                   />
                 </div>
 
@@ -272,7 +272,7 @@ export function ManageBookingPage() {
                   <button
                     type="button"
                     onClick={() => setIsCancelModalOpen(false)}
-                    className="px-4 py-2 text-xs font-semibold text-slate-600 hover:text-slate-800 rounded-lg hover:bg-slate-100 transition-colors"
+                    className="px-4 py-2 text-xs font-semibold text-gray-600 hover:text-gray-800 rounded-lg hover:bg-gray-100 transition-colors"
                   >
                     Keep Appointment
                   </button>

@@ -122,7 +122,7 @@ export function BookingsPage() {
       )}
 
       {/* Filter & Search Bar */}
-      <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm space-y-3">
+      <div className="bg-white p-4 rounded-2xl border border-gray-100 shadow-[0_4px_25px_rgba(0,0,0,0.05)] space-y-3">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
           {/* Search */}
           <form onSubmit={handleSearchSubmit} className="relative">
@@ -132,7 +132,7 @@ export function BookingsPage() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search customer, email..."
-              className="w-full pl-9 pr-3 py-2 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-indigo-500 outline-none"
+              className="w-full pl-9 pr-3 py-2 bg-[#f9fafb] border border-gray-200 rounded-lg text-xs text-gray-900 focus:bg-white focus:border-[#1e3a8a] focus:ring-1 focus:ring-[#1e3a8a] focus:outline-none transition-all"
             />
           </form>
 
@@ -142,7 +142,7 @@ export function BookingsPage() {
               type="date"
               value={selectedDate}
               onChange={(e) => setSelectedDate(e.target.value)}
-              className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs bg-white focus:ring-2 focus:ring-indigo-500 outline-none"
+              className="w-full px-3 py-2 bg-[#f9fafb] border border-gray-200 rounded-lg text-xs text-gray-900 focus:bg-white focus:border-[#1e3a8a] focus:ring-1 focus:ring-[#1e3a8a] focus:outline-none transition-all"
             />
           </div>
 
@@ -151,7 +151,7 @@ export function BookingsPage() {
             <select
               value={selectedStaffId}
               onChange={(e) => setSelectedStaffId(e.target.value)}
-              className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs bg-white focus:ring-2 focus:ring-indigo-500 outline-none"
+              className="w-full px-3 py-2 bg-[#f9fafb] border border-gray-200 rounded-lg text-xs text-gray-900 focus:bg-white focus:border-[#1e3a8a] focus:ring-1 focus:ring-[#1e3a8a] focus:outline-none transition-all"
             >
               <option value="">All Staff Providers</option>
               {staffList.map((st) => (
@@ -167,7 +167,7 @@ export function BookingsPage() {
             <select
               value={selectedStatus}
               onChange={(e) => setSelectedStatus(e.target.value)}
-              className="w-full px-3 py-2 border border-slate-300 rounded-lg text-xs bg-white focus:ring-2 focus:ring-indigo-500 outline-none"
+              className="w-full px-3 py-2 bg-[#f9fafb] border border-gray-200 rounded-lg text-xs text-gray-900 focus:bg-white focus:border-[#1e3a8a] focus:ring-1 focus:ring-[#1e3a8a] focus:outline-none transition-all"
             >
               <option value="">All Statuses</option>
               <option value="CONFIRMED">CONFIRMED</option>
@@ -180,7 +180,7 @@ export function BookingsPage() {
         </div>
 
         {(selectedDate || selectedStaffId || selectedStatus || searchQuery) && (
-          <div className="flex items-center space-x-2 text-xs text-indigo-600 font-semibold pt-1">
+          <div className="flex items-center space-x-2 text-xs text-[#1e3a8a] font-semibold pt-1">
             <button
               onClick={() => {
                 setSelectedDate('');
@@ -199,18 +199,18 @@ export function BookingsPage() {
       {/* Bookings Table / List */}
       {isLoading ? (
         <div className="py-12 flex justify-center text-slate-400">
-          <Loader2 className="w-8 h-8 animate-spin text-indigo-600" />
+          <Loader2 className="w-8 h-8 animate-spin text-[#1e3a8a]" />
         </div>
       ) : bookings.length === 0 ? (
-        <div className="text-center py-12 bg-white rounded-xl border border-dashed border-slate-300 p-8">
+        <div className="text-center py-12 bg-white rounded-2xl border border-dashed border-gray-200 p-8 shadow-[0_4px_25px_rgba(0,0,0,0.05)]">
           <Calendar className="w-10 h-10 text-slate-400 mx-auto mb-3" />
-          <h3 className="text-base font-bold text-slate-900">No Bookings Found</h3>
-          <p className="text-xs text-slate-500 mt-1 max-w-sm mx-auto">
+          <h3 className="text-base font-light text-gray-800">No Bookings Found</h3>
+          <p className="text-xs text-gray-500 mt-1 max-w-sm mx-auto">
             No appointments match the selected filter criteria. Customers can book online through your public link.
           </p>
         </div>
       ) : (
-        <div className="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+        <div className="bg-white rounded-2xl border border-gray-100 shadow-[0_4px_25px_rgba(0,0,0,0.05)] overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
               <thead className="bg-slate-50 border-b border-slate-200 text-slate-500 uppercase tracking-wider font-semibold">
@@ -240,7 +240,7 @@ export function BookingsPage() {
 
                       <td className="py-3.5 px-4">
                         <p className="font-semibold text-slate-800 text-xs flex items-center space-x-1">
-                          <Scissors className="w-3.5 h-3.5 text-indigo-600" />
+                          <Scissors className="w-3.5 h-3.5 text-[#1e3a8a]" />
                           <span>{b.serviceId?.name || 'Service'}</span>
                         </p>
                         <p className="text-slate-500 mt-0.5 flex items-center space-x-1">
@@ -299,7 +299,7 @@ export function BookingsPage() {
                               <button
                                 type="button"
                                 onClick={() => handleUpdateStatus(b._id, 'CHECKED_IN')}
-                                className="px-2 py-0.5 text-[11px] bg-indigo-50 text-indigo-700 hover:bg-indigo-100 rounded font-bold border border-indigo-200 transition-colors"
+                                className="px-2 py-0.5 text-[11px] bg-blue-50 text-[#1e3a8a] hover:bg-blue-100 rounded font-bold border border-blue-200 transition-colors"
                               >
                                 Check In
                               </button>
@@ -353,7 +353,7 @@ export function BookingsPage() {
       {/* Cancel Confirmation Modal */}
       {cancelBookingId && (
         <div className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl shadow-xl border border-slate-200 max-w-md w-full p-6 space-y-4">
+          <div className="bg-white rounded-2xl shadow-xl border border-gray-100 max-w-md w-full p-6 space-y-4">
             <div className="w-12 h-12 rounded-full bg-rose-50 text-rose-600 flex items-center justify-center mx-auto">
               <XCircle className="w-6 h-6" />
             </div>

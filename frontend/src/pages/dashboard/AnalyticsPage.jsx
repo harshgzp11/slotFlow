@@ -60,11 +60,11 @@ export function AnalyticsPage() {
         </div>
 
         <div className="flex items-center space-x-2">
-          <label className="text-xs font-semibold text-slate-500">Time Window:</label>
+          <label className="text-xs font-semibold uppercase tracking-wider text-gray-500">Time Window:</label>
           <select
             value={daysWindow}
             onChange={(e) => setDaysWindow(e.target.value)}
-            className="px-3 py-1.5 border border-slate-300 rounded-lg text-xs bg-white font-medium focus:ring-2 focus:ring-indigo-500 outline-none"
+            className="bg-[#f9fafb] border border-gray-200 rounded-lg py-1.5 px-3 text-xs text-gray-900 focus:bg-white focus:border-[#1e3a8a] focus:ring-1 focus:ring-[#1e3a8a] focus:outline-none transition-all"
           >
             <option value="7">Past 7 Days</option>
             <option value="30">Past 30 Days</option>
@@ -82,7 +82,7 @@ export function AnalyticsPage() {
 
       {isLoading ? (
         <div className="py-20 flex justify-center text-slate-400">
-          <Loader2 className="w-8 h-8 animate-spin text-indigo-600" />
+          <Loader2 className="w-8 h-8 animate-spin text-[#1e3a8a]" />
         </div>
       ) : (
         <>
@@ -109,13 +109,13 @@ export function AnalyticsPage() {
             </div>
 
             {/* Capacity Utilization */}
-            <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
+            <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-[0_4px_25px_rgba(0,0,0,0.05)] flex flex-col justify-between">
               <div>
                 <div className="flex items-center justify-between text-slate-500 mb-1">
                   <span className="text-xs font-bold uppercase tracking-wider">
                     Capacity Utilization
                   </span>
-                  <Percent className="w-4 h-4 text-indigo-600" />
+                  <Percent className="w-4 h-4 text-[#1e3a8a]" />
                 </div>
                 <div className="text-3xl font-black text-slate-900">
                   {metrics.capacityUtilizationPercentage || 0}%
@@ -131,7 +131,7 @@ export function AnalyticsPage() {
             </div>
 
             {/* Total Revenue */}
-            <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
+            <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-[0_4px_25px_rgba(0,0,0,0.05)] flex flex-col justify-between">
               <div>
                 <div className="flex items-center justify-between text-slate-500 mb-1">
                   <span className="text-xs font-bold uppercase tracking-wider">Total Revenue</span>
@@ -151,7 +151,7 @@ export function AnalyticsPage() {
             </div>
 
             {/* Cancellation Rate */}
-            <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
+            <div className="bg-white p-5 rounded-2xl border border-gray-100 shadow-[0_4px_25px_rgba(0,0,0,0.05)] flex flex-col justify-between">
               <div>
                 <div className="flex items-center justify-between text-slate-500 mb-1">
                   <span className="text-xs font-bold uppercase tracking-wider">
@@ -175,9 +175,9 @@ export function AnalyticsPage() {
 
           {/* Revenue Breakdown by Source */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 md:col-span-1 space-y-4">
+            <div className="bg-white rounded-2xl border border-gray-100 shadow-[0_4px_25px_rgba(0,0,0,0.05)] p-6 md:col-span-1 space-y-4">
               <h2 className="text-base font-bold text-slate-900 flex items-center space-x-2">
-                <PieChart className="w-4 h-4 text-indigo-600" />
+                <PieChart className="w-4 h-4 text-[#1e3a8a]" />
                 <span>Booking Channels</span>
               </h2>
 
@@ -209,9 +209,9 @@ export function AnalyticsPage() {
             </div>
 
             {/* Staff Performance Table */}
-            <div className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 md:col-span-2 space-y-4">
+            <div className="bg-white rounded-2xl border border-gray-100 shadow-[0_4px_25px_rgba(0,0,0,0.05)] p-6 md:col-span-2 space-y-4">
               <h2 className="text-base font-bold text-slate-900 flex items-center space-x-2">
-                <Users className="w-4 h-4 text-indigo-600" />
+                <Users className="w-4 h-4 text-[#1e3a8a]" />
                 <span>Specialist Provider Efficiency</span>
               </h2>
 
