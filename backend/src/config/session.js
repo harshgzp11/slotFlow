@@ -35,15 +35,18 @@ export function createSessionMiddleware(mongoUrl) {
     });
   }
 
+  const isProduction = env.NODE_ENV === 'production';
+
   return session({
     secret: env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
     store,
+    proxy: isProduction,
     cookie: {
       httpOnly: true,
-      secure: env.NODE_ENV === 'production',
-      sameSite: 'lax',
+      secure: isProduction,
+      sameSite: isProduction ? 'none' : 'lax',
       maxAge: 7 * 24 * 60 * 60 * 1000
     }
   });

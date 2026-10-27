@@ -31,7 +31,15 @@ export const envSchema = z
     SESSION_SECRET: z.string().optional(),
     REDIS_URL: z.string().optional(),
     EMAIL_PROVIDER_API_KEY: z.string().optional(),
-    EMAIL_FROM: z.string().default('notifications@slotflow.app')
+    EMAIL_FROM: z.string().default('notifications@slotflow.app'),
+    ENABLE_BACKGROUND_WORKER: z
+      .union([z.string(), z.boolean()])
+      .default(true)
+      .transform((val) => val === true || val === 'true'),
+    WORKER_INTERVAL_MS: z
+      .union([z.string(), z.number()])
+      .default(15000)
+      .transform((val) => (typeof val === 'number' ? val : parseInt(val, 10)))
   })
   .superRefine((data, ctx) => {
     if (data.NODE_ENV === 'production') {

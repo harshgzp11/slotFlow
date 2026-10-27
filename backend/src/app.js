@@ -16,10 +16,29 @@ export function createApp(mongoUrl) {
     })
   );
 
+  // Enable proxy trust for production reverse proxies (Render, Railway, Vercel, Fly.io, etc.)
+  if (env.NODE_ENV === 'production' || process.env.TRUST_PROXY === '1' || process.env.TRUST_PROXY === 'true') {
+    app.set('trust proxy', 1);
+  }
+
+  // Parse allowed origins (supports comma-separated list, trims whitespace and trailing slashes)
+  const allowedOrigins = (env.CLIENT_ORIGIN || '')
+    .split(',')
+    .map((origin) => origin.trim().replace(/\/+$/, ''))
+    .filter(Boolean);
+
   // CORS Configuration
   app.use(
     cors({
-      origin: env.CLIENT_ORIGIN,
+      origin: (origin, callback) => {
+        // Allow requests with no origin (e.g. mobile apps, curl, server-to-server, supertest)
+        if (!origin) return callback(null, true);
+        const normalizedOrigin = origin.replace(/\/+$/, '');
+        if (allowedOrigins.includes(normalizedOrigin) || allowedOrigins.includes('*')) {
+          return callback(null, true);
+        }
+        return callback(new Error(`CORS blocked for origin: ${origin}`));
+      },
       credentials: true,
       methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
       allowedHeaders: ['Content-Type', 'Authorization', 'x-business-id']

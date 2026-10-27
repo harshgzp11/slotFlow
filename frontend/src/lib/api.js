@@ -1,3 +1,5 @@
+const API_BASE_URL = (import.meta.env.VITE_API_URL || '').replace(/\/+$/, '');
+
 /**
  * Standard API request wrapper for SlotFlow
  * @param {string} endpoint
@@ -13,7 +15,7 @@ export async function apiRequest(endpoint, options = {}) {
     headers.set('x-business-id', activeBusinessId);
   }
 
-  const response = await fetch(`/api/v1${endpoint}`, {
+  const response = await fetch(`${API_BASE_URL}/api/v1${endpoint}`, {
     ...options,
     headers,
     credentials: 'include' // Send session cookie
